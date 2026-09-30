@@ -51,6 +51,7 @@ public final class AppController: ObservableObject {
     /// Loads the room list and opens Getting Started on the first launch.
     public func start() {
         rooms = store.load()
+        if fillMissingDirectKeys() { persist() }
         if !defaults.bool(forKey: AppController.hasLaunchedBeforeKey) {
             defaults.set(true, forKey: AppController.hasLaunchedBeforeKey)
             openGettingStarted()
@@ -160,7 +161,7 @@ public final class AppController: ObservableObject {
             w.minimumSize = catalog.measureMinimumSize(of: window)
             return w
         }
-        let room = Room(name: name, windows: measured, layout: .auto)
+        let room = Room(name: name, windows: measured, layout: .auto, directKey: lowestFreeDirectKey())
         rooms.append(room)
         persist()
         showRoom(id: room.id)
@@ -364,7 +365,7 @@ public final class AppController: ObservableObject {
         }
         let current = visible.map { $0.frame }
         let layout = LayoutEngine.recognize(frames: current, count: current.count, in: area) ?? .auto
-        let room = Room(name: nextDefaultRoomName(), windows: measured, layout: layout)
+        let room = Room(name: nextDefaultRoomName(), windows: measured, layout: layout, directKey: lowestFreeDirectKey())
         rooms.append(room)
         currentRoomID = room.id
         persist()
@@ -373,18 +374,34 @@ public final class AppController: ObservableObject {
 
     // MARK: Keys, rename, delete
 
-    /// ⌘1–9: gives the room that direct key, taking it from any other room; the room's own key clears it.
+    /// ⌘1–9: gives the room that direct key; the room that had it takes this room's previous key (they swap).
+    /// The room's own key changes nothing.
     public func assignDirectKey(_ key: Int, toRoom id: UUID) {
-        guard (1...9).contains(key), let room = room(id) else { return }
-        if room.directKey == key {
-            update(id) { $0.directKey = nil }
-        } else {
-            for other in rooms where other.directKey == key {
-                update(other.id) { $0.directKey = nil }
-            }
-            update(id) { $0.directKey = key }
+        guard (1...9).contains(key), let room = room(id), room.directKey != key else { return }
+        let previous = room.directKey
+        for other in rooms where other.directKey == key {
+            update(other.id) { $0.directKey = previous }
         }
+        update(id) { $0.directKey = key }
         persist()
+    }
+
+    /// The lowest direct key from 1 to 9 no room has, or nil when all nine are taken.
+    private func lowestFreeDirectKey() -> Int? {
+        let taken = Set(rooms.compactMap { $0.directKey })
+        return (1...9).first { !taken.contains($0) }
+    }
+
+    /// Gives each room without a direct key the lowest free one, in creation order. Returns whether any changed.
+    private func fillMissingDirectKeys() -> Bool {
+        var changed = false
+        let order = rooms.indices.sorted { (rooms[$0].createdAt, $0) < (rooms[$1].createdAt, $1) }
+        for index in order where rooms[index].directKey == nil {
+            guard let key = lowestFreeDirectKey() else { break }
+            rooms[index].directKey = key
+            changed = true
+        }
+        return changed
     }
 
     public func beginRename(ofRoom id: UUID) {
@@ -407,6 +424,7 @@ public final class AppController: ObservableObject {
     public func deleteRoom(id: UUID) {
         rooms.removeAll { $0.id == id }
         if currentRoomID == id { currentRoomID = nil }
+        _ = fillMissingDirectKeys()
         persist()
     }
 

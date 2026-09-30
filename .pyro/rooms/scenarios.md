@@ -56,10 +56,10 @@ All scenarios drive `AppController` and its view models through `FakeWindowSyste
 - AT8.b 800×600 ignoring resizes → measured 0×0, ends at the original frame.
 
 ## FS9 — Create Room saves
-- S9.1 Saved room: windows in badge order, layout Auto, no direct key, lastShown nil before showing... (note: FS16 shows the room right after save, so lastShown becomes set; check order & layout & key). Store file exists; reload contains the room.
+- S9.1 Saved room: windows in badge order, layout Auto, direct key = lowest free 1–9 (none when all nine are taken). Store file exists; reload contains the room.
 - S9.2 Minimum size measured for each selected window before saving; saved windows carry the fake's minimum sizes.
 - S9.3 Picker closes after saving.
-- AT9.a Select B, A, C → order B, A, C; layout Auto; no key; minimum sizes present; reload from disk shows same order.
+- AT9.a Select B, A, C → order B, A, C; layout Auto; lowest free key; minimum sizes present; reload from disk shows same order.
 
 ## FS10 — Re-finding windows (WindowMatcher)
 - S10.1 Exact identity (bundle id + pid + windowID) match wins.
@@ -143,6 +143,7 @@ All scenarios drive `AppController` and its view models through `FakeWindowSyste
 - S20.1 New room named "Room n", smallest n ≥ 1 not used by any room, case-insensitive ("Room 1", "room 3" → "Room 2").
 - S20.2 Windows: listed on the current screen, not minimized, app not hidden, not Rooms' own; front to back, frontmost is place 1. Minimum sizes measured.
 - S20.3 Layout: first of Focus, Columns, Grid, Stack whose frames are within 24 pt per edge of current frames; otherwise Auto. No window moved.
+- S20.4b New room gets the lowest free direct key 1–9, none when all nine are taken.
 - S20.4 Room appended and persisted; becomes CurrentRoom; its row is selected; the palette stays open.
 - S20.5 No window visible on the current screen → nothing saved, hint unchanged.
 - S20.6 Works with any selection, including the Create row and an empty RoomList.
@@ -174,10 +175,16 @@ All scenarios drive `AppController` and its view models through `FakeWindowSyste
 - S25.3 Save Room replaces windows in badge order, re-measures minimum sizes, persists, closes.
 - S25.4 If the room is current, it is shown again after saving.
 
+## FS26a — Automatic direct keys on load
+- S26a.1 On load, rooms without a key get the lowest free key 1–9 in creation order; RoomList is written.
+- S26a.2 A tenth room keeps no key; deleting a room gives its key to the first keyless room in creation order.
+- AT26a.a A, B, C, D (only C has 1) → A 2, B 3, D 4.
+- AT26a.b Ten rooms → tenth none; delete key-5 room → tenth gets 5.
+
 ## FS26 — ⌘1–9 direct keys
-- S26.1 ⌘3 on selected room sets key 3 and persists; a room that had key 3 loses it; pressing the room's own key clears it.
+- S26.1 ⌘n on the selected room sets key n and persists; the room that had n takes the selected room's previous key (or none); pressing the room's own key changes nothing.
 - S26.2 Footer hint "⌘1–9 Key".
-- AT26.a A key 3, then B key 3 → A none, B 3; ⌘3 on B → B none; each state on disk.
+- AT26.a A=1, B=2; ⌘2 on A → A 2, B 1; ⌘2 on A again → unchanged; each state on disk.
 
 ## FS27 — ⌃⌥1–9 shows the room
 - S27.1 Hotkey n shows the room with key n (same effects as showing from the palette).

@@ -78,7 +78,7 @@ final class PaletteRowsTests: XCTestCase {
         XCTAssertTrue(row.icons.allSatisfy { $0 != nil })
         XCTAssertEqual(row.trailer, "⌃⌥4")
         guard case .room(let plain) = h.controller.palette.rows[2] else { return XCTFail("expected room row") }
-        XCTAssertNil(plain.trailer)
+        XCTAssertEqual(plain.trailer, "⌃⌥3", "rooms are numbered automatically")
     }
 
     func testCurrentWinsOverDirectKey() {

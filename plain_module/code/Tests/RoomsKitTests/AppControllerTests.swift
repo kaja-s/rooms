@@ -23,7 +23,7 @@ final class AppControllerTests: XCTestCase {
         XCTAssertEqual(room.windows.map { $0.identity.windowID }, [2, 1])
         XCTAssertEqual(room.windows[1].minimumSize, CGSize(width: 320, height: 240))
         XCTAssertEqual(room.layout, .auto)
-        XCTAssertNil(room.directKey)
+        XCTAssertEqual(room.directKey, 1, "a new room gets the lowest free key")
         XCTAssertEqual(h.controller.currentRoomID, room.id)
         XCTAssertNotNil(h.reload()[0].lastShown)
     }
@@ -132,18 +132,34 @@ final class AppControllerTests: XCTestCase {
         let x = h.app("x", pid: 1, name: "X")
         let a = h.window(x, id: 1, title: "A")
         let b = h.window(x, id: 2, title: "B")
-        h.seed([Room(name: "A", windows: [a]), Room(name: "B", windows: [b])])
+        h.seed([Room(name: "A", windows: [a], createdAt: Date(timeIntervalSince1970: 1)),
+                Room(name: "B", windows: [b], createdAt: Date(timeIntervalSince1970: 2))])
         let idA = h.controller.rooms[0].id, idB = h.controller.rooms[1].id
+        XCTAssertEqual(h.controller.room(idA)?.directKey, 1, "numbered automatically on load")
+        XCTAssertEqual(h.controller.room(idB)?.directKey, 2)
         h.controller.assignDirectKey(3, toRoom: idA)
+        XCTAssertEqual(h.controller.room(idA)?.directKey, 3)
         h.controller.assignDirectKey(3, toRoom: idB)
-        XCTAssertNil(h.controller.room(idA)?.directKey)
+        XCTAssertEqual(h.controller.room(idA)?.directKey, 2, "A takes B's previous key")
         XCTAssertEqual(h.controller.room(idB)?.directKey, 3)
         h.controller.directKeyPressed(3)
         XCTAssertEqual(h.controller.currentRoomID, idB)
         h.controller.directKeyPressed(7)
         XCTAssertEqual(h.controller.currentRoomID, idB)
         h.controller.assignDirectKey(3, toRoom: idB)
-        XCTAssertNil(h.reload()[1].directKey)
+        XCTAssertEqual(h.reload()[1].directKey, 3, "the room's own key changes nothing")
+        XCTAssertEqual(h.reload()[0].directKey, 2)
+    }
+
+    func testDeletingARoomGivesItsKeyToTheFirstRoomWithout() {
+        let h = TestHarness()
+        let x = h.app("x", pid: 1, name: "X")
+        let a = h.window(x, id: 1, title: "A")
+        h.seed((1...10).map { Room(name: "R\($0)", windows: [a], createdAt: Date(timeIntervalSince1970: Double($0))) })
+        XCTAssertEqual(h.controller.rooms.map { $0.directKey }, [1, 2, 3, 4, 5, 6, 7, 8, 9, nil])
+        h.controller.deleteRoom(id: h.controller.rooms[4].id)
+        XCTAssertEqual(h.controller.rooms.last?.directKey, 5)
+        XCTAssertEqual(h.reload().last?.directKey, 5)
     }
 
     func testSnapKeysCycleThirds() {

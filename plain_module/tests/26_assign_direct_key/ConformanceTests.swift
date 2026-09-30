@@ -45,27 +45,26 @@ final class Harness {
 }
 
 final class AssignDirectKeyTests: XCTestCase {
-    func testAcceptanceKeyMovesBetweenRoomsAndClears() {
+    func testAcceptanceKeysSwapAndOwnKeyChangesNothing() {
         let h = Harness()
         let x = h.app("x", pid: 1, name: "X")
         let a = h.window(x, id: 1, title: "A")
-        h.seed([Room(name: "A", windows: [a], createdAt: Date(timeIntervalSince1970: 1)), Room(name: "B", windows: [a], createdAt: Date(timeIntervalSince1970: 2))])
+        h.seed([Room(name: "A", windows: [a], directKey: 1, createdAt: Date(timeIntervalSince1970: 1)),
+                Room(name: "B", windows: [a], directKey: 2, createdAt: Date(timeIntervalSince1970: 2))])
         let idA = h.controller.rooms[0].id, idB = h.controller.rooms[1].id
         let palette = h.controller.palette
         palette.open()
         XCTAssertTrue(palette.footerHints.contains("⌘1–9 Key"))
-        palette.pressCommandDigit(3)
-        XCTAssertEqual(h.controller.room(idA)?.directKey, 3)
-        XCTAssertEqual(h.reload()[0].directKey, 3)
-        palette.moveSelection(by: 1)
-        palette.pressCommandDigit(3)
-        XCTAssertNil(h.controller.room(idA)?.directKey)
-        XCTAssertEqual(h.controller.room(idB)?.directKey, 3)
-        XCTAssertNil(h.reload()[0].directKey)
-        XCTAssertEqual(h.reload()[1].directKey, 3)
-        palette.pressCommandDigit(3)
-        XCTAssertNil(h.controller.room(idB)?.directKey)
-        XCTAssertNil(h.reload()[1].directKey)
+        XCTAssertEqual(palette.rows[palette.selectedIndex].roomID, idA)
+        palette.pressCommandDigit(2)
+        XCTAssertEqual(h.controller.room(idA)?.directKey, 2)
+        XCTAssertEqual(h.controller.room(idB)?.directKey, 1, "B takes A's previous key")
+        XCTAssertEqual(h.reload().first { $0.id == idA }?.directKey, 2)
+        XCTAssertEqual(h.reload().first { $0.id == idB }?.directKey, 1)
+        palette.pressCommandDigit(2)
+        XCTAssertEqual(h.controller.room(idA)?.directKey, 2, "pressing the room's own key changes nothing")
+        XCTAssertEqual(h.controller.room(idB)?.directKey, 1)
+        XCTAssertEqual(h.reload().first { $0.id == idA }?.directKey, 2)
     }
 
     func testOtherKeysAreIndependentAndRowShowsKey() {

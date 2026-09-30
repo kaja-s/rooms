@@ -48,7 +48,7 @@ description: Menu bar Mac app that saves a project's windows as a named room and
   - Name (required, unique among rooms, case-insensitive)
   - Windows: ordered list of :AppWindow: items; position 1 is the main window (required, at least one)
   - Layout: the :Layout: the room remembers (required)
-  - Direct key: a number 1 to 9, unique among rooms (optional)
+  - Direct key: a number 1 to 9, unique among rooms; a new :Room: gets the lowest free number, and only a :Room: beyond the ninth has none (optional)
   - Last shown: the time the room was last shown (optional)
 
 - :WindowCatalog: is the component of :RoomsApp: that lists the open :AppWindow: items of all running applications, and finds a saved :AppWindow: again among them.
@@ -194,14 +194,14 @@ description: Menu bar Mac app that saves a project's windows as a named room and
   - An 800 by 600 window whose application ignores resize requests is measured as 0 by 0, and ends at its original frame.
 
 - Create Room in :WindowPicker: saves a :Room:.
-  - The windows are the selected cards in place-number order; the :Layout: is Auto; the direct key is unset.
+  - The windows are the selected cards in place-number order; the :Layout: is Auto; the direct key is the lowest one from 1 to 9 that no other :Room: has, or none when all nine are taken.
   - :WindowCatalog: measures the minimum size of each selected :AppWindow: before saving.
   - The :Room: is appended to :RoomList: and :RoomList: is written to disk, so it is present after :RoomsApp: relaunches.
   - :WindowPicker: closes.
 
   ***acceptance tests***
   - Selecting cards B, A, then C and pressing Create Room saves the room with windows in the order B, A, C.
-    - The saved :Room: has :Layout: Auto and no direct key.
+    - The saved :Room: has :Layout: Auto and the lowest free direct key.
     - Each saved :AppWindow: carries the minimum size :WindowCatalog: measured.
     - A :RoomList: loaded again from the same file contains that :Room: with the same window order.
 
@@ -288,6 +288,7 @@ description: Menu bar Mac app that saves a project's windows as a named room and
   - The windows are those :WindowCatalog: lists on :CurrentScreen: that are not minimized and whose application is not hidden, front to back; the frontmost is place 1.
   - :WindowCatalog: measures the minimum size of each window.
   - The :Layout: is the first of Focus, Columns, Grid, Stack whose computed frames are within 24 points on each edge of the windows' current frames, and Auto otherwise; no window is moved.
+  - The :Room: gets the lowest direct key from 1 to 9 that no other :Room: has, or none when all nine are taken.
   - The :Room: is appended to :RoomList:, :RoomList: is written, the :Room: becomes :CurrentRoom:, and its row is selected in :Palette:, which stays open.
   - When no window is visible on :CurrentScreen:, nothing is saved.
   - The bottom of :Palette: shows the key hint "⌘S New room"; for 2 seconds after ⌘S it reads "Saved “Room <n>”" instead.
@@ -323,13 +324,20 @@ description: Menu bar Mac app that saves a project's windows as a named room and
   - Save Room replaces the room's windows with the selected cards in place-number order, measures their minimum sizes again, writes :RoomList: to disk, and closes :WindowPicker:.
   - When the room is :CurrentRoom:, it is shown again after saving.
 
+- When :RoomList: is loaded, each :Room: without a direct key gets the lowest one from 1 to 9 that no other :Room: has, in creation order, and :RoomList: is written.
+  - A :Room: beyond the ninth keeps no direct key; when a :Room: is deleted, its key goes to the first :Room: without one, in creation order.
+
+  ***acceptance tests***
+  - Loading rooms A, B, C, and D, created in that order, where only C has key 1, gives A key 2, B key 3, and D key 4.
+  - With ten rooms, the tenth has no key; deleting the room with key 5 gives key 5 to the tenth.
+
 - Pressing ⌘1 to ⌘9 in :Palette: gives the selected room that direct key and writes :RoomList: to disk.
-  - A :Room: that had that key loses it.
-  - Pressing the key the selected room already has clears its direct key.
+  - The :Room: that had that key takes the selected room's previous key, or none when the selected room had none.
+  - Pressing the key the selected room already has changes nothing.
   - The bottom of :Palette: shows the key hint "⌘1–9 Key".
 
   ***acceptance tests***
-  - Giving room A key 3, then room B key 3, leaves A without a key and B with key 3; pressing ⌘3 again on B clears B's key.
+  - With room A on key 1 and room B on key 2, pressing ⌘2 on A gives A key 2 and B key 1; pressing ⌘2 on A again keeps both keys.
     - Each state is present in a :RoomList: reloaded from disk.
 
 - Pressing ⌃⌥1 to ⌃⌥9 anywhere shows the :Room: with that direct key, as if chosen in :Palette:.

@@ -61,7 +61,7 @@ final class CreateRoomSavesTests: XCTestCase {
         XCTAssertEqual(room.name, "Build")
         XCTAssertEqual(room.windows.map { $0.identity }, [b.identity, a.identity, c.identity])
         XCTAssertEqual(room.layout, .auto)
-        XCTAssertNil(room.directKey)
+        XCTAssertEqual(room.directKey, 1, "the lowest free direct key")
         XCTAssertEqual(room.windows.map { $0.minimumSize }, [CGSize(width: 410, height: 310), CGSize(width: 300, height: 200), CGSize(width: 520, height: 420)])
         // Minimum sizes were measured before saving: each window was resized to 1x1 and restored.
         XCTAssertTrue(h.fake.operations.contains(.setSize(a.identity, CGSize(width: 1, height: 1))))
@@ -69,7 +69,7 @@ final class CreateRoomSavesTests: XCTestCase {
         XCTAssertEqual(reloaded.count, 1)
         XCTAssertEqual(reloaded[0].windows.map { $0.identity }, [b.identity, a.identity, c.identity])
         XCTAssertEqual(reloaded[0].layout, .auto)
-        XCTAssertNil(reloaded[0].directKey)
+        XCTAssertEqual(reloaded[0].directKey, 1)
     }
 
     func testRoomListIsAppended() {

@@ -64,9 +64,9 @@ final class PaletteDesignTests: XCTestCase {
         palette.open()
         XCTAssertEqual(palette.rowTrailingElements(at: 0), ["⌃⌥1", "↵", "ⓧ"])
         XCTAssertEqual(palette.rowTrailingElements(at: 1), ["⌃⌥2"])
-        XCTAssertEqual(palette.rowTrailingElements(at: 2), [])
+        XCTAssertEqual(palette.rowTrailingElements(at: 2), ["⌃⌥3"])
         palette.moveSelection(by: 2)
-        XCTAssertEqual(palette.rowTrailingElements(at: 2), ["↵", "ⓧ"])
+        XCTAssertEqual(palette.rowTrailingElements(at: 2), ["⌃⌥3", "↵", "ⓧ"])
         XCTAssertEqual(palette.rowTrailingElements(at: 0), ["⌃⌥1"])
     }
 
