@@ -85,6 +85,10 @@ public enum PaletteDesign {
     public static let listInset: CGFloat = 12
     public static let searchRowHeight: CGFloat = 72
     public static let footerHeight: CGFloat = 44
+    public static let dividerHeight: CGFloat = 1
+    /// Space between the divider and the list's top inset.
+    public static let dividerToList: CGFloat = 8
+    public static let emptyStateHeight: CGFloat = 64
     public static let iconSlotWidth: CGFloat = 100
     public static let iconSize: CGFloat = 22
     public static let iconCornerRadius: CGFloat = 6
@@ -104,6 +108,15 @@ public enum PaletteDesign {
 
     /// Nothing is drawn between the list and the key hints.
     public static let sections: [PaletteSection] = [.searchField, .divider, .list, .keyHints]
+
+    /// Height of the palette: search row, divider, list, and key hints added together.
+    /// `rowCount` 0 is the empty state, which shows the empty-state block instead of rows.
+    public static func panelHeight(rowCount: Int) -> CGFloat {
+        let list = rowCount > 0
+            ? rowHeight * CGFloat(rowCount) + rowSpacing * CGFloat(rowCount - 1)
+            : emptyStateHeight
+        return searchRowHeight + dividerHeight + dividerToList + listInset + list + listInset + footerHeight
+    }
 
     public static let returnGlyph = "↵"
     public static let deleteGlyph = "ⓧ"
@@ -188,6 +201,11 @@ public final class PaletteViewModel: ObservableObject {
             isCurrent: isCurrent,
             directKey: room.directKey
         )
+    }
+
+    /// Height of the palette for the current rows; the panel frame is set to exactly this.
+    public var panelHeight: CGFloat {
+        PaletteDesign.panelHeight(rowCount: rows.count)
     }
 
     /// Shown in the list area when there are no rooms and nothing is typed.

@@ -1,0 +1,47 @@
+{
+  "": {
+    "swift-dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/primary.swiftdeps"
+  },
+  "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/LayoutEngine.swift": {
+    "dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/LayoutEngine.d",
+    "object": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/LayoutEngine.swift.o",
+    "swiftmodule": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/LayoutEngine~partial.swiftmodule",
+    "swift-dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/LayoutEngine.swiftdeps",
+    "diagnostics": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/LayoutEngine.dia"
+  },
+  "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/Models.swift": {
+    "dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/Models.d",
+    "object": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/Models.swift.o",
+    "swiftmodule": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/Models~partial.swiftmodule",
+    "swift-dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/Models.swiftdeps",
+    "diagnostics": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/Models.dia"
+  },
+  "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/RoomMatcher.swift": {
+    "dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/RoomMatcher.d",
+    "object": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/RoomMatcher.swift.o",
+    "swiftmodule": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/RoomMatcher~partial.swiftmodule",
+    "swift-dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/RoomMatcher.swiftdeps",
+    "diagnostics": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/RoomMatcher.dia"
+  },
+  "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/RoomStore.swift": {
+    "dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/RoomStore.d",
+    "object": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/RoomStore.swift.o",
+    "swiftmodule": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/RoomStore~partial.swiftmodule",
+    "swift-dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/RoomStore.swiftdeps",
+    "diagnostics": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/RoomStore.dia"
+  },
+  "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/SnapGrid.swift": {
+    "dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/SnapGrid.d",
+    "object": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/SnapGrid.swift.o",
+    "swiftmodule": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/SnapGrid~partial.swiftmodule",
+    "swift-dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/SnapGrid.swiftdeps",
+    "diagnostics": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/SnapGrid.dia"
+  },
+  "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/WindowMatcher.swift": {
+    "dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/WindowMatcher.d",
+    "object": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/WindowMatcher.swift.o",
+    "swiftmodule": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/WindowMatcher~partial.swiftmodule",
+    "swift-dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/WindowMatcher.swiftdeps",
+    "diagnostics": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/WindowMatcher.dia"
+  }
+}

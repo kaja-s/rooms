@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/ConformanceTests.build/primary.swiftdeps"
+  },
+  "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/ConformanceTests/Placeholder.swift": {
+    "dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/ConformanceTests.build/Placeholder.d",
+    "object": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/ConformanceTests.build/Placeholder.swift.o",
+    "swiftmodule": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/ConformanceTests.build/Placeholder~partial.swiftmodule",
+    "swift-dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/ConformanceTests.build/Placeholder.swiftdeps",
+    "diagnostics": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/ConformanceTests.build/Placeholder.dia"
+  }
+}

@@ -259,4 +259,21 @@ extension PaletteViewModelTests {
         XCTAssertEqual(palette.leadingFooterHints.first, "Here: Focus")
         XCTAssertTrue(PaletteViewModel.tabHint.hasPrefix("⇥"))
     }
+
+    func testPanelHeightFollowsRows() {
+        let (h, _) = seeded()
+        let palette = h.controller.palette
+        palette.open()
+        XCTAssertEqual(palette.panelHeight, PaletteDesign.panelHeight(rowCount: 3))
+        XCTAssertEqual(palette.panelHeight, 349)
+        palette.query = "Deep"
+        XCTAssertEqual(palette.panelHeight, PaletteDesign.panelHeight(rowCount: palette.rows.count))
+        palette.query = ""
+        XCTAssertEqual(palette.panelHeight, 349)
+    }
+
+    func testPanelHeightOfEmptyStateUsesEmptyBlock() {
+        XCTAssertEqual(PaletteDesign.panelHeight(rowCount: 0),
+                       PaletteDesign.panelHeight(rowCount: 1) - PaletteDesign.rowHeight + PaletteDesign.emptyStateHeight)
+    }
 }

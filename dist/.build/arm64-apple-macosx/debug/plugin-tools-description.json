@@ -1,0 +1,2046 @@
+{
+  "builtTestProducts" : [
+    {
+      "binaryPath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsPackageTests.xctest/Contents/MacOS/RoomsPackageTests",
+      "packagePath" : "/Users/kajaskerlj/Dev/personal/rooms/dist",
+      "productName" : "RoomsPackageTests"
+    }
+  ],
+  "copyCommands" : {
+
+  },
+  "explicitTargetDependencyImportCheckingMode" : {
+    "none" : {
+
+    }
+  },
+  "generatedSourceTargetSet" : [
+
+  ],
+  "pluginDescriptions" : [
+
+  ],
+  "swiftCommands" : {
+    "C.ConformanceTests-arm64-apple-macosx-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/ConformanceTests.build/sources",
+      "importPath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/ConformanceTests/Placeholder.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules/RoomsCore.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules/RoomsKit.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/ConformanceTests.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "ConformanceTests",
+      "moduleOutputPath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules/ConformanceTests.swiftmodule",
+      "objects" : [
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/ConformanceTests.build/Placeholder.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx14.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-Xfrontend",
+        "-enable-cross-import-overlays",
+        "-j10",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-color-diagnostics",
+        "-swift-version",
+        "5",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "dist"
+      ],
+      "outputFileMapPath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/ConformanceTests.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/ConformanceTests.build/Placeholder.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules/ConformanceTests.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/ConformanceTests/Placeholder.swift"
+      ],
+      "tempsPath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/ConformanceTests.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.Rooms-arm64-apple-macosx-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Rooms.build/sources",
+      "importPath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/Rooms/main.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules/RoomsKit.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Rooms.build/sources"
+        }
+      ],
+      "isLibrary" : false,
+      "moduleName" : "Rooms",
+      "moduleOutputPath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules/Rooms.swiftmodule",
+      "objects" : [
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Rooms.build/main.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx14.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-j10",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-Xfrontend",
+        "-entry-point-function-name",
+        "-Xfrontend",
+        "Rooms_main",
+        "-color-diagnostics",
+        "-swift-version",
+        "5",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "dist"
+      ],
+      "outputFileMapPath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Rooms.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Rooms.build/main.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules/Rooms.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/Rooms/main.swift"
+      ],
+      "tempsPath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Rooms.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.RoomsCore-arm64-apple-macosx-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/sources",
+      "importPath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/LayoutEngine.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/Models.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/RoomMatcher.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/RoomStore.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/SnapGrid.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/WindowMatcher.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "RoomsCore",
+      "moduleOutputPath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules/RoomsCore.swiftmodule",
+      "objects" : [
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/LayoutEngine.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/Models.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/RoomMatcher.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/RoomStore.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/SnapGrid.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/WindowMatcher.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx14.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-j10",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-emit-objc-header",
+        "-emit-objc-header-path",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/include/RoomsCore-Swift.h",
+        "-color-diagnostics",
+        "-swift-version",
+        "5",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "dist"
+      ],
+      "outputFileMapPath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/LayoutEngine.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/Models.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/RoomMatcher.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/RoomStore.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/SnapGrid.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/WindowMatcher.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules/RoomsCore.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/LayoutEngine.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/Models.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/RoomMatcher.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/RoomStore.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/SnapGrid.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/WindowMatcher.swift"
+      ],
+      "tempsPath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.RoomsCoreTests-arm64-apple-macosx-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCoreTests.build/sources",
+      "importPath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsCoreTests/LayoutEngineTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsCoreTests/ModelsTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsCoreTests/RoomMatcherTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsCoreTests/RoomStoreTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsCoreTests/SnapGridTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsCoreTests/WindowMatcherTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules/RoomsCore.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCoreTests.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "RoomsCoreTests",
+      "moduleOutputPath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules/RoomsCoreTests.swiftmodule",
+      "objects" : [
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCoreTests.build/LayoutEngineTests.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCoreTests.build/ModelsTests.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCoreTests.build/RoomMatcherTests.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCoreTests.build/RoomStoreTests.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCoreTests.build/SnapGridTests.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCoreTests.build/WindowMatcherTests.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx14.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-Xfrontend",
+        "-enable-cross-import-overlays",
+        "-j10",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-color-diagnostics",
+        "-swift-version",
+        "5",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "dist"
+      ],
+      "outputFileMapPath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCoreTests.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCoreTests.build/LayoutEngineTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCoreTests.build/ModelsTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCoreTests.build/RoomMatcherTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCoreTests.build/RoomStoreTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCoreTests.build/SnapGridTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCoreTests.build/WindowMatcherTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules/RoomsCoreTests.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsCoreTests/LayoutEngineTests.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsCoreTests/ModelsTests.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsCoreTests/RoomMatcherTests.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsCoreTests/RoomStoreTests.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsCoreTests/SnapGridTests.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsCoreTests/WindowMatcherTests.swift"
+      ],
+      "tempsPath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCoreTests.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.RoomsKit-arm64-apple-macosx-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/sources",
+      "importPath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/AccessibilityWindowSystem.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/AppController.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/Dialogs.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/FakeWindowSystem.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/GettingStartedWindow.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/HotkeyCenter.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/LayoutPreviewOverlay.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/PalettePanel.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/RoomsApp.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/StatusItemController.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/ViewModels.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/WindowCatalog.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/WindowPickerWindow.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/WindowSystem.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules/RoomsCore.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "RoomsKit",
+      "moduleOutputPath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules/RoomsKit.swiftmodule",
+      "objects" : [
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/AccessibilityWindowSystem.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/AppController.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/Dialogs.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/FakeWindowSystem.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/GettingStartedWindow.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/HotkeyCenter.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/LayoutPreviewOverlay.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/PalettePanel.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/RoomsApp.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/StatusItemController.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/ViewModels.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/WindowCatalog.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/WindowPickerWindow.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/WindowSystem.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx14.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-j10",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-emit-objc-header",
+        "-emit-objc-header-path",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/include/RoomsKit-Swift.h",
+        "-color-diagnostics",
+        "-swift-version",
+        "5",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "dist"
+      ],
+      "outputFileMapPath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/AccessibilityWindowSystem.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/AppController.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/Dialogs.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/FakeWindowSystem.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/GettingStartedWindow.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/HotkeyCenter.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/LayoutPreviewOverlay.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/PalettePanel.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/RoomsApp.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/StatusItemController.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/ViewModels.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/WindowCatalog.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/WindowPickerWindow.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/WindowSystem.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules/RoomsKit.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/AccessibilityWindowSystem.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/AppController.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/Dialogs.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/FakeWindowSystem.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/GettingStartedWindow.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/HotkeyCenter.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/LayoutPreviewOverlay.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/PalettePanel.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/RoomsApp.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/StatusItemController.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/ViewModels.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/WindowCatalog.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/WindowPickerWindow.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/WindowSystem.swift"
+      ],
+      "tempsPath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.RoomsKitTests-arm64-apple-macosx-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/sources",
+      "importPath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/AppControllerTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/FakeWindowSystemTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/GettingStartedModelTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/PaletteViewModelTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/RenameDialogModelTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/RoomsAppTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/StatusMenuModelTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/TestHarness.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/WindowCatalogTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/WindowPickerViewModelTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules/RoomsKit.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "RoomsKitTests",
+      "moduleOutputPath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules/RoomsKitTests.swiftmodule",
+      "objects" : [
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/AppControllerTests.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/FakeWindowSystemTests.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/GettingStartedModelTests.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/PaletteViewModelTests.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/RenameDialogModelTests.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/RoomsAppTests.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/StatusMenuModelTests.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/TestHarness.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/WindowCatalogTests.swift.o",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/WindowPickerViewModelTests.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx14.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-Xfrontend",
+        "-enable-cross-import-overlays",
+        "-j10",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-color-diagnostics",
+        "-swift-version",
+        "5",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "dist"
+      ],
+      "outputFileMapPath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/AppControllerTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/FakeWindowSystemTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/GettingStartedModelTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/PaletteViewModelTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/RenameDialogModelTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/RoomsAppTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/StatusMenuModelTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/TestHarness.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/WindowCatalogTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/WindowPickerViewModelTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules/RoomsKitTests.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/AppControllerTests.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/FakeWindowSystemTests.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/GettingStartedModelTests.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/PaletteViewModelTests.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/RenameDialogModelTests.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/RoomsAppTests.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/StatusMenuModelTests.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/TestHarness.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/WindowCatalogTests.swift",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/WindowPickerViewModelTests.swift"
+      ],
+      "tempsPath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.RoomsPackageTests-arm64-apple-macosx-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsPackageTests.build/sources",
+      "importPath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsPackageTests.derived/runner.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules/RoomsKitTests.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules/RoomsCoreTests.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules/ConformanceTests.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsPackageTests.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "RoomsPackageTests",
+      "moduleOutputPath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules/RoomsPackageTests.swiftmodule",
+      "objects" : [
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsPackageTests.build/runner.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx14.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-Xfrontend",
+        "-enable-cross-import-overlays",
+        "-j10",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-emit-objc-header",
+        "-emit-objc-header-path",
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsPackageTests.build/include/RoomsPackageTests-Swift.h",
+        "-color-diagnostics",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "dist"
+      ],
+      "outputFileMapPath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsPackageTests.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsPackageTests.build/runner.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules/RoomsPackageTests.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsPackageTests.derived/runner.swift"
+      ],
+      "tempsPath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsPackageTests.build",
+      "wholeModuleOptimization" : false
+    }
+  },
+  "swiftFrontendCommands" : {
+
+  },
+  "swiftTargetScanArgs" : {
+    "ConformanceTests" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "ConformanceTests",
+      "-package-name",
+      "dist",
+      "-c",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/ConformanceTests/Placeholder.swift",
+      "-I",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx14.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-Xfrontend",
+      "-enable-cross-import-overlays",
+      "-j10",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-color-diagnostics",
+      "-swift-version",
+      "5",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "dist",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "Rooms" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "Rooms",
+      "-package-name",
+      "dist",
+      "-c",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/Rooms/main.swift",
+      "-I",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx14.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-j10",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-Xfrontend",
+      "-entry-point-function-name",
+      "-Xfrontend",
+      "Rooms_main",
+      "-color-diagnostics",
+      "-swift-version",
+      "5",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "dist",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "RoomsCore" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "RoomsCore",
+      "-package-name",
+      "dist",
+      "-c",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/LayoutEngine.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/Models.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/RoomMatcher.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/RoomStore.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/SnapGrid.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/WindowMatcher.swift",
+      "-I",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx14.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-j10",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-emit-objc-header",
+      "-emit-objc-header-path",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/include/RoomsCore-Swift.h",
+      "-color-diagnostics",
+      "-swift-version",
+      "5",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "dist",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "RoomsCoreTests" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "RoomsCoreTests",
+      "-package-name",
+      "dist",
+      "-c",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsCoreTests/LayoutEngineTests.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsCoreTests/ModelsTests.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsCoreTests/RoomMatcherTests.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsCoreTests/RoomStoreTests.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsCoreTests/SnapGridTests.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsCoreTests/WindowMatcherTests.swift",
+      "-I",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx14.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-Xfrontend",
+      "-enable-cross-import-overlays",
+      "-j10",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-color-diagnostics",
+      "-swift-version",
+      "5",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "dist",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "RoomsKit" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "RoomsKit",
+      "-package-name",
+      "dist",
+      "-c",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/AccessibilityWindowSystem.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/AppController.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/Dialogs.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/FakeWindowSystem.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/GettingStartedWindow.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/HotkeyCenter.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/LayoutPreviewOverlay.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/PalettePanel.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/RoomsApp.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/StatusItemController.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/ViewModels.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/WindowCatalog.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/WindowPickerWindow.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/WindowSystem.swift",
+      "-I",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx14.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-j10",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-emit-objc-header",
+      "-emit-objc-header-path",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/include/RoomsKit-Swift.h",
+      "-color-diagnostics",
+      "-swift-version",
+      "5",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "dist",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "RoomsKitTests" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "RoomsKitTests",
+      "-package-name",
+      "dist",
+      "-c",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/AppControllerTests.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/FakeWindowSystemTests.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/GettingStartedModelTests.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/PaletteViewModelTests.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/RenameDialogModelTests.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/RoomsAppTests.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/StatusMenuModelTests.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/TestHarness.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/WindowCatalogTests.swift",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/WindowPickerViewModelTests.swift",
+      "-I",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx14.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-Xfrontend",
+      "-enable-cross-import-overlays",
+      "-j10",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-color-diagnostics",
+      "-swift-version",
+      "5",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "dist",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "RoomsPackageTests" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "RoomsPackageTests",
+      "-package-name",
+      "dist",
+      "-c",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsPackageTests.derived/runner.swift",
+      "-I",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx14.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-Xfrontend",
+      "-enable-cross-import-overlays",
+      "-j10",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-emit-objc-header",
+      "-emit-objc-header-path",
+      "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsPackageTests.build/include/RoomsPackageTests-Swift.h",
+      "-color-diagnostics",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "dist",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ]
+  },
+  "targetDependencyMap" : {
+    "ConformanceTests" : [
+      "RoomsKit",
+      "RoomsCore"
+    ],
+    "Rooms" : [
+      "RoomsKit",
+      "RoomsCore"
+    ],
+    "RoomsCore" : [
+
+    ],
+    "RoomsCoreTests" : [
+      "RoomsCore"
+    ],
+    "RoomsKit" : [
+      "RoomsCore"
+    ],
+    "RoomsKitTests" : [
+      "RoomsKit",
+      "RoomsCore"
+    ],
+    "RoomsPackageTests" : [
+      "ConformanceTests",
+      "RoomsCoreTests",
+      "RoomsKitTests",
+      "RoomsKit",
+      "RoomsCore"
+    ]
+  },
+  "testDiscoveryCommands" : {
+
+  },
+  "testEntryPointCommands" : {
+    "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsPackageTests.derived/runner.swift" : {
+      "inputs" : [
+
+      ],
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsPackageTests.derived/runner.swift"
+        }
+      ]
+    }
+  },
+  "traitConfiguration" : {
+    "default" : {
+
+    }
+  },
+  "writeCommands" : {
+    "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/ConformanceTests.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/ConformanceTests/Placeholder.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/ConformanceTests.build/sources"
+    },
+    "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Rooms-entitlement.plist" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<entitlement-plist>"
+        },
+        {
+          "kind" : "virtual",
+          "name" : "<com.apple.security.get-task-allow>"
+        }
+      ],
+      "outputFilePath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Rooms-entitlement.plist"
+    },
+    "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Rooms.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/Rooms/main.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Rooms.build/sources"
+    },
+    "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Rooms.product/Objects.LinkFileList" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<link-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Rooms.build/main.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/LayoutEngine.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/Models.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/RoomMatcher.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/RoomStore.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/SnapGrid.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/WindowMatcher.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/AccessibilityWindowSystem.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/AppController.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/Dialogs.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/FakeWindowSystem.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/GettingStartedWindow.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/HotkeyCenter.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/LayoutPreviewOverlay.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/PalettePanel.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/RoomsApp.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/StatusItemController.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/ViewModels.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/WindowCatalog.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/WindowPickerWindow.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/WindowSystem.swift.o"
+        }
+      ],
+      "outputFilePath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/Rooms.product/Objects.LinkFileList"
+    },
+    "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/LayoutEngine.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/Models.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/RoomMatcher.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/RoomStore.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/SnapGrid.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsCore/WindowMatcher.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/sources"
+    },
+    "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCoreTests.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsCoreTests/LayoutEngineTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsCoreTests/ModelsTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsCoreTests/RoomMatcherTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsCoreTests/RoomStoreTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsCoreTests/SnapGridTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsCoreTests/WindowMatcherTests.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCoreTests.build/sources"
+    },
+    "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/AccessibilityWindowSystem.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/AppController.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/Dialogs.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/FakeWindowSystem.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/GettingStartedWindow.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/HotkeyCenter.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/LayoutPreviewOverlay.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/PalettePanel.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/RoomsApp.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/StatusItemController.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/ViewModels.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/WindowCatalog.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/WindowPickerWindow.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Sources/RoomsKit/WindowSystem.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/sources"
+    },
+    "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/AppControllerTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/FakeWindowSystemTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/GettingStartedModelTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/PaletteViewModelTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/RenameDialogModelTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/RoomsAppTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/StatusMenuModelTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/TestHarness.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/WindowCatalogTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/WindowPickerViewModelTests.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/sources"
+    },
+    "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsPackageTests.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsPackageTests.derived/runner.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsPackageTests.build/sources"
+    },
+    "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsPackageTests.product/Objects.LinkFileList" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<link-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/ConformanceTests.build/Placeholder.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/LayoutEngine.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/Models.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/RoomMatcher.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/RoomStore.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/SnapGrid.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCore.build/WindowMatcher.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCoreTests.build/LayoutEngineTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCoreTests.build/ModelsTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCoreTests.build/RoomMatcherTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCoreTests.build/RoomStoreTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCoreTests.build/SnapGridTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsCoreTests.build/WindowMatcherTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/AccessibilityWindowSystem.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/AppController.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/Dialogs.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/FakeWindowSystem.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/GettingStartedWindow.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/HotkeyCenter.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/LayoutPreviewOverlay.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/PalettePanel.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/RoomsApp.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/StatusItemController.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/ViewModels.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/WindowCatalog.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/WindowPickerWindow.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKit.build/WindowSystem.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/AppControllerTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/FakeWindowSystemTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/GettingStartedModelTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/PaletteViewModelTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/RenameDialogModelTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/RoomsAppTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/StatusMenuModelTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/TestHarness.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/WindowCatalogTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/WindowPickerViewModelTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsPackageTests.build/runner.swift.o"
+        }
+      ],
+      "outputFilePath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsPackageTests.product/Objects.LinkFileList"
+    },
+    "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt" : {
+      "alwaysOutOfDate" : true,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<swift-get-version>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+        }
+      ],
+      "outputFilePath" : "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+    }
+  }
+}

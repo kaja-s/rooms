@@ -64,9 +64,9 @@ final class PalettePanelController {
             .store(in: &cancellables)
     }
 
+    /// The panel is exactly as tall as its content, computed from the design tokens.
     private func contentHeight() -> CGFloat {
-        hosting.layoutSubtreeIfNeeded()
-        return max(hosting.fittingSize.height, 120).rounded()
+        controller.palette.panelHeight
     }
 
     private func show() {
@@ -181,7 +181,7 @@ struct PaletteView: View {
                 }
             }
         }
-        .frame(width: PaletteDesign.panelWidth)
+        .frame(width: PaletteDesign.panelWidth, height: palette.panelHeight, alignment: .top)
         .background(PaletteColors.panelFill, in: RoundedRectangle(cornerRadius: PaletteDesign.panelCornerRadius, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: PaletteDesign.panelCornerRadius, style: .continuous).strokeBorder(PaletteColors.panelBorder, lineWidth: 1))
         .clipShape(RoundedRectangle(cornerRadius: PaletteDesign.panelCornerRadius, style: .continuous))
@@ -209,7 +209,7 @@ struct PaletteView: View {
     private var divider: some View {
         Rectangle()
             .fill(PaletteColors.divider)
-            .frame(height: 1)
+            .frame(height: PaletteDesign.dividerHeight)
             .padding(.horizontal, PaletteDesign.horizontalInset)
     }
 
@@ -221,7 +221,7 @@ struct PaletteView: View {
                     .font(.system(size: 15))
                     .foregroundStyle(PaletteColors.textSecondary)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 24)
+                    .frame(height: PaletteDesign.emptyStateHeight)
             } else {
                 ForEach(Array(rows.enumerated()), id: \.offset) { index, row in
                     PaletteRowView(row: row,
@@ -238,8 +238,8 @@ struct PaletteView: View {
             }
         }
         .padding(.horizontal, PaletteDesign.listInset)
-        .padding(.top, 8 + PaletteDesign.listInset - 4)
-        .padding(.bottom, 4)
+        .padding(.top, PaletteDesign.dividerToList + PaletteDesign.listInset)
+        .padding(.bottom, PaletteDesign.listInset)
     }
 
     private var footer: some View {

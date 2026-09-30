@@ -1,0 +1,75 @@
+{
+  "": {
+    "swift-dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/primary.swiftdeps"
+  },
+  "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/AppControllerTests.swift": {
+    "dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/AppControllerTests.d",
+    "object": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/AppControllerTests.swift.o",
+    "swiftmodule": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/AppControllerTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/AppControllerTests.swiftdeps",
+    "diagnostics": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/AppControllerTests.dia"
+  },
+  "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/FakeWindowSystemTests.swift": {
+    "dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/FakeWindowSystemTests.d",
+    "object": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/FakeWindowSystemTests.swift.o",
+    "swiftmodule": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/FakeWindowSystemTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/FakeWindowSystemTests.swiftdeps",
+    "diagnostics": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/FakeWindowSystemTests.dia"
+  },
+  "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/GettingStartedModelTests.swift": {
+    "dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/GettingStartedModelTests.d",
+    "object": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/GettingStartedModelTests.swift.o",
+    "swiftmodule": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/GettingStartedModelTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/GettingStartedModelTests.swiftdeps",
+    "diagnostics": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/GettingStartedModelTests.dia"
+  },
+  "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/PaletteViewModelTests.swift": {
+    "dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/PaletteViewModelTests.d",
+    "object": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/PaletteViewModelTests.swift.o",
+    "swiftmodule": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/PaletteViewModelTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/PaletteViewModelTests.swiftdeps",
+    "diagnostics": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/PaletteViewModelTests.dia"
+  },
+  "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/RenameDialogModelTests.swift": {
+    "dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/RenameDialogModelTests.d",
+    "object": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/RenameDialogModelTests.swift.o",
+    "swiftmodule": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/RenameDialogModelTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/RenameDialogModelTests.swiftdeps",
+    "diagnostics": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/RenameDialogModelTests.dia"
+  },
+  "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/RoomsAppTests.swift": {
+    "dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/RoomsAppTests.d",
+    "object": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/RoomsAppTests.swift.o",
+    "swiftmodule": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/RoomsAppTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/RoomsAppTests.swiftdeps",
+    "diagnostics": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/RoomsAppTests.dia"
+  },
+  "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/StatusMenuModelTests.swift": {
+    "dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/StatusMenuModelTests.d",
+    "object": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/StatusMenuModelTests.swift.o",
+    "swiftmodule": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/StatusMenuModelTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/StatusMenuModelTests.swiftdeps",
+    "diagnostics": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/StatusMenuModelTests.dia"
+  },
+  "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/TestHarness.swift": {
+    "dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/TestHarness.d",
+    "object": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/TestHarness.swift.o",
+    "swiftmodule": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/TestHarness~partial.swiftmodule",
+    "swift-dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/TestHarness.swiftdeps",
+    "diagnostics": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/TestHarness.dia"
+  },
+  "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/WindowCatalogTests.swift": {
+    "dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/WindowCatalogTests.d",
+    "object": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/WindowCatalogTests.swift.o",
+    "swiftmodule": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/WindowCatalogTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/WindowCatalogTests.swiftdeps",
+    "diagnostics": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/WindowCatalogTests.dia"
+  },
+  "/Users/kajaskerlj/Dev/personal/rooms/dist/Tests/RoomsKitTests/WindowPickerViewModelTests.swift": {
+    "dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/WindowPickerViewModelTests.d",
+    "object": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/WindowPickerViewModelTests.swift.o",
+    "swiftmodule": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/WindowPickerViewModelTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/WindowPickerViewModelTests.swiftdeps",
+    "diagnostics": "/Users/kajaskerlj/Dev/personal/rooms/dist/.build/arm64-apple-macosx/debug/RoomsKitTests.build/WindowPickerViewModelTests.dia"
+  }
+}
