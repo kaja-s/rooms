@@ -6,7 +6,7 @@ Open the windows a project needs, press ⌥Space, give them a name, and from the
 
 ## The experiment
 
-This project started from [Rooms by Sara (@saragordic)](https://github.com/saragordic/rooms), an open-source macOS app. I wanted to see whether I could use **regenerative software** to recreate it and then add my own twist, without writing any code myself.
+This project started from [Rooms by Sara Gordić](https://github.com/saragordic/rooms), an open-source macOS app. I wanted to see whether I could use **regenerative software** to recreate it and then add my own twist, without writing any code myself.
 
 I don't know Swift. So instead of editing code, I described the app in a natural-language spec that I can read and review: [`rooms.plain`](rooms.plain), written in [***plain](https://codeplain.ai). I rendered that spec into a working Swift app with **\*codeplain**. Every change to the app, whether a bug fix, a design tweak, or a new feature, was made in the spec first and then rendered again. The generated code in `plain_module/` and `dist/` is never edited by hand.
 
@@ -73,6 +73,8 @@ A short guide opens on first launch, and any time from the menu bar. It walks th
 
 Requirements: macOS 14 or newer and the Swift toolchain (Xcode or the command-line tools).
 
+This repository holds the spec, not the generated code. Render [`rooms.plain`](rooms.plain) with \*codeplain first. The renderer writes the Swift package to `plain_module/code/` and copies it to `dist/`. Then run:
+
 ```sh
 cd dist
 swift run Rooms
@@ -88,9 +90,9 @@ On first use, macOS asks for two permissions:
 |---|---|
 | [`rooms.plain`](rooms.plain) | **The source of truth.** The whole app as a natural-language spec: concepts, implementation and test requirements, functional specs, and acceptance tests. |
 | [`resources/`](resources) | Design documents the spec links to (palette, layout preview, notification). |
-| `plain_module/code/` | Swift code rendered from the spec. Never edited by hand. |
-| `plain_module/tests/` | Conformance tests rendered from the spec, one folder per functional spec. |
-| `dist/` | Copy of the rendered code to build and run. |
+| `plain_module/code/` | Swift code rendered from the spec. Never edited by hand, and not committed. |
+| `plain_module/tests/` | Conformance tests rendered from the spec, one folder per functional spec. Not committed. |
+| `dist/` | Copy of the rendered code to build and run. Not committed. |
 | [`test_scripts/`](test_scripts) | Scripts that prepare the environment and run the unit and conformance tests. |
 | [`config.yaml`](config.yaml) | Renderer configuration. |
 
@@ -104,6 +106,10 @@ To change the app, change `rooms.plain` and render it again. The tests run again
 
 ## Credits
 
-- Original idea and app: [saragordic/rooms](https://github.com/saragordic/rooms).
+- Original idea and app: [Sara Gordić, saragordic/rooms](https://github.com/saragordic/rooms), MIT License.
 - Spec language and rendering: [***plain / *codeplain](https://codeplain.ai).
 - Specs written with Claude Code.
+
+## License
+
+[MIT](LICENSE). The original Rooms is © 2026 Sara Gordić, also under the MIT License.
