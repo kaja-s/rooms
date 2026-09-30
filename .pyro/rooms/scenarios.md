@@ -47,6 +47,13 @@ All scenarios drive `AppController` and its view models through `FakeWindowSyste
 ## FS8 — Minimum size measurement
 - S8.1 Measuring asks the fake to resize to 1×1, reads the settled size (the fake's configured minimum), then restores the original frame exactly; the recorded operations show resize(1×1), then set-frame(original).
 - S8.2 Position is unchanged after measuring.
+- S8.3 With a 120 ms resize delay, reads are taken every 50 ms (fake clock via wait) until the size differs from the original and two consecutive reads match; the result is the application's real minimum (400×300), not the current size.
+- S8.4 Reading stops after at most 500 ms of waiting even if the size keeps changing; the last read is used.
+- S8.5 A dimension the application did not shrink at all (equal to the original) is recorded as 0; a window that ignores resizes is measured 0×0.
+- S8.6 The original frame is restored after measuring in every case (delayed, ignoring, immediate).
+- S8.7 With corrected minimums (0 or real), Columns and Grid fit and are offered by ⇥ for full-height windows that previously blocked them.
+- AT8.a 800×600, 120 ms delay, minimum 400×300 → measured 400×300, ends at the original frame.
+- AT8.b 800×600 ignoring resizes → measured 0×0, ends at the original frame.
 
 ## FS9 — Create Room saves
 - S9.1 Saved room: windows in badge order, layout Auto, no direct key, lastShown nil before showing... (note: FS16 shows the room right after save, so lastShown becomes set; check order & layout & key). Store file exists; reload contains the room.
@@ -100,11 +107,13 @@ All scenarios drive `AppController` and its view models through `FakeWindowSyste
 - S16.1 After Create Room, the new room is the current room and its windows have been laid out (fake recorded moves).
 
 ## FS17 — Tab cycles layouts
-- S17.1 Cycle order Auto, Focus, Columns, Grid, My Layout, Stack; non-fitting layouts skipped; My Layout skipped without frames; wraps around; ⇧⇥ goes backwards.
+- S17.1 Cycle order Auto, Focus, Columns, Grid, My Layout, Stack; every layout is offered whether or not it fits the room's windows; My Layout is offered whenever the room has My Layout frames and skipped without them; wraps around; ⇧⇥ goes backwards.
 - S17.2 Change persisted immediately.
 - S17.3 If the selected room is current, its windows move immediately to new frames.
 - S17.4 Footer shows "Here: <resolved layout>" (Auto shows the resolved concrete layout) and hint "⇥ Layout".
-- AT17.a Auto room, all layouts fit, no My Layout frames: ⇥ ×5 → Focus, Columns, Grid, Stack, Auto; then ⇧⇥ → Stack; each state persisted on disk.
+- AT17.a Auto room, three windows, no My Layout frames: ⇥ ×5 → Focus, Columns, Grid, Stack, Auto; then ⇧⇥ → Stack; each state persisted on disk.
+- AT17.b Auto room, three windows of minimum width 1000 on 1440×900: ⇥ ×4 → Focus, Columns, Grid, Stack (nothing skipped).
+- S17.5 Choosing a layout a window cannot shrink into still moves the windows to that layout's frames; the application keeps the size it settles on.
 
 ## FS18 — Layout preview overlay
 - S18.1 After opening the palette the preview is hidden (`isPreviewVisible == false`, `preview == nil`).

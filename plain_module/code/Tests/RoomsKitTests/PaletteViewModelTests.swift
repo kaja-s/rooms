@@ -136,7 +136,7 @@ final class PaletteViewModelTests: XCTestCase {
         XCTAssertEqual(palette.preview?.frames.count, 2)
     }
 
-    func testTabSkipsLayoutsThatDoNotFit() {
+    func testTabOffersLayoutsThatDoNotFit() {
         let h = TestHarness()
         let x = h.app("x", pid: 1, name: "X")
         let a = h.window(x, id: 1, title: "A", minimumSize: CGSize(width: 1000, height: 100))
@@ -144,9 +144,9 @@ final class PaletteViewModelTests: XCTestCase {
         h.seed([Room(name: "R", windows: [a, b], layout: .auto, myLayoutFrames: [CGRect(x: 8, y: 8, width: 1000, height: 400), CGRect(x: 8, y: 450, width: 1000, height: 400)])])
         let palette = h.controller.palette
         palette.open()
-        palette.pressTab(); XCTAssertEqual(h.controller.rooms[0].layout, .myLayout)
-        palette.pressTab(); XCTAssertEqual(h.controller.rooms[0].layout, .stack)
-        palette.pressTab(); XCTAssertEqual(h.controller.rooms[0].layout, .auto)
+        var seen: [Layout] = []
+        for _ in 0..<6 { palette.pressTab(); seen.append(h.controller.rooms[0].layout) }
+        XCTAssertEqual(seen, [.focus, .columns, .grid, .myLayout, .stack, .auto])
     }
 
     func testCommandKeys() {

@@ -71,14 +71,29 @@ final class TabCyclesLayoutsTests: XCTestCase {
         XCTAssertEqual(h.reload()[0].layout, .stack)
     }
 
-    func testNonFittingAndMissingMyLayoutAreSkipped() {
+    func testAcceptanceNonFittingLayoutsAreStillOffered() {
         let h = Harness()
         _ = seedRoom(h, minWidth: 1000)
         let palette = h.controller.palette
         palette.open()
-        palette.pressTab(); XCTAssertEqual(h.controller.rooms[0].layout, .stack)
-        palette.pressTab(); XCTAssertEqual(h.controller.rooms[0].layout, .auto)
+        var seen: [Layout] = []
+        for _ in 0..<4 { palette.pressTab(); seen.append(h.controller.rooms[0].layout) }
+        XCTAssertEqual(seen, [.focus, .columns, .grid, .stack])
+        palette.pressTab(); XCTAssertEqual(h.controller.rooms[0].layout, .auto, "My Layout skipped without frames")
         palette.pressTab(shift: true); XCTAssertEqual(h.controller.rooms[0].layout, .stack)
+    }
+
+    func testNonFittingLayoutStillMovesCurrentRoomWindows() {
+        let h = Harness()
+        let id = seedRoom(h, minWidth: 1000)
+        h.controller.showRoom(id: id)
+        let palette = h.controller.palette
+        palette.open()
+        palette.pressTab(); palette.pressTab()
+        XCTAssertEqual(h.controller.rooms[0].layout, .columns)
+        let columns = LayoutEngine.frames(for: .columns, count: 3, in: h.area)
+        let requested = h.fake.operations.compactMap { op -> CGRect? in if case .setFrame(_, let f) = op { return f } else { return nil } }
+        XCTAssertTrue(columns.allSatisfy { requested.contains($0) }, "each window is asked to take its Columns frame")
     }
 
     func testMyLayoutIsOfferedWhenFramesExist() {

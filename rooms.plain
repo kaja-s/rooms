@@ -94,6 +94,8 @@ description: Menu bar Mac app that saves a project's windows as a named room and
 
 - `RoomsKit` includes `FakeWindowSystem`, a public in-memory `WindowSystem` whose applications, windows, screens, permission flags, and recorded operations are set and read directly by test code.
 
+- `FakeWindowSystem` can give a window a resize delay in milliseconds, applied on its fake clock advanced by `wait(milliseconds:)`, and can make a window ignore resize requests.
+
 - `RoomStore` and `AppController` take the JSON file location by injection, defaulting to the Application Support path.
 
 - `Package.swift` declares the test targets `RoomsCoreTests` (depends on `RoomsCore`), `RoomsKitTests` (depends on `RoomsKit`), and `ConformanceTests` at `Tests/ConformanceTests` (depends on `RoomsCore` and `RoomsKit`), the last holding only an empty `Placeholder.swift` with no test cases.
@@ -166,7 +168,13 @@ description: Menu bar Mac app that saves a project's windows as a named room and
 
 - :WindowCatalog: measures the minimum size of an :AppWindow:.
   - It asks the window to resize to 1 by 1 point, reads the size the application actually allows, and restores the original frame.
+  - Applications apply a resize with a delay, so the size is read every 50 ms until it differs from the original size and two reads in a row match, or 500 ms have passed, and the last read is the minimum size.
+  - A width or height the application did not shrink at all is recorded as 0.
   - The window is not moved, and its content is not changed.
+
+  ***acceptance tests***
+  - An 800 by 600 window whose application applies resizes 120 ms after the request and allows at least 400 by 300 is measured as 400 by 300, and ends at its original frame.
+  - An 800 by 600 window whose application ignores resize requests is measured as 0 by 0, and ends at its original frame.
 
 - Create Room in :WindowPicker: saves a :Room:.
   - The windows are the selected cards in place-number order; the :Layout: is Auto; the direct key is unset.
@@ -230,15 +238,16 @@ description: Menu bar Mac app that saves a project's windows as a named room and
 
 - Create Room in :WindowPicker: shows the new :Room: right after saving it.
 
-- Pressing ⇥ in :Palette: sets the selected room's :Layout: to the next one that fits, and ⇧⇥ to the previous one.
-  - The cycle order is Auto, Focus, Columns, Grid, My Layout, Stack; a layout that does not fit the room's windows on :CurrentScreen: is skipped, and My Layout is skipped when the room has no My Layout frames.
+- Pressing ⇥ in :Palette: sets the selected room's :Layout: to the next one in the cycle, and ⇧⇥ to the previous one.
+  - The cycle order is Auto, Focus, Columns, Grid, My Layout, Stack; every layout is offered whether or not it fits the room's windows, and My Layout is skipped when the room has no My Layout frames.
   - The change is written to :RoomList: at once.
   - When the selected room is :CurrentRoom:, its found windows move to the new frames at once.
   - The bottom of :Palette: shows "Here: <resolved layout name>" for the selected room and the key hint "⇥ Layout".
 
   ***acceptance tests***
-  - For a room on Auto with no My Layout frames whose three windows fit every layout, pressing ⇥ five times yields Focus, Columns, Grid, Stack, Auto in that order, and ⇧⇥ then yields Stack.
+  - For a room on Auto with no My Layout frames and three windows, pressing ⇥ five times yields Focus, Columns, Grid, Stack, Auto in that order, and ⇧⇥ then yields Stack.
     - After each press the room's :Layout: in a :RoomList: reloaded from disk is the one shown.
+  - For a room on Auto with three windows of minimum width 1000 on a 1440 by 900 visible area, pressing ⇥ four times still yields Focus, Columns, Grid, Stack.
 
 - While :Palette: is open, pressing ⇥ or ⇧⇥ shows the layout preview: a click-through overlay covering the visible area of :CurrentScreen:, above every window except :Palette:, drawn per :LayoutPreviewDesign:.
   - The overlay has one card per saved window of the selected :Room:, at the frame :LayoutEngine: computes for the room's :Layout: on :CurrentScreen:, showing the application icon, the application name, and the window title.

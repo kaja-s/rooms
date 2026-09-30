@@ -23,6 +23,28 @@ final class WindowCatalogTests: XCTestCase {
         XCTAssertEqual(fake.operations, [.setSize(id, CGSize(width: 1, height: 1)), .setFrame(id, original)])
     }
 
+    func testMeasureWaitsForDelayedResize() {
+        let fake = FakeWindowSystem()
+        let app = fake.addApplication(bundleIdentifier: "a", processIdentifier: 1, name: "A")
+        let original = CGRect(x: 0, y: 0, width: 800, height: 600)
+        let id = fake.addWindow(of: app, windowID: 1, title: "W", frame: original, minimumSize: CGSize(width: 400, height: 300))
+        fake.setResizeBehavior(of: id, delayMilliseconds: 120)
+        let measured = WindowCatalog(system: fake).measureMinimumSize(of: fake.listWindows()[0])
+        XCTAssertEqual(measured, CGSize(width: 400, height: 300))
+        XCTAssertEqual(fake.waitedMilliseconds, 200)
+    }
+
+    func testMeasureRecordsUnshrunkDimensionAsZero() {
+        let fake = FakeWindowSystem()
+        let app = fake.addApplication(bundleIdentifier: "a", processIdentifier: 1, name: "A")
+        let id = fake.addWindow(of: app, windowID: 1, title: "W", frame: CGRect(x: 0, y: 0, width: 800, height: 600))
+        fake.setResizeBehavior(of: id, ignoresResize: true)
+        let measured = WindowCatalog(system: fake).measureMinimumSize(of: fake.listWindows()[0])
+        XCTAssertEqual(measured, .zero)
+        XCTAssertEqual(fake.waitedMilliseconds, 500)
+        XCTAssertEqual(fake.frame(of: id), CGRect(x: 0, y: 0, width: 800, height: 600))
+    }
+
     func testFindKeepsSavedMinimumSize() {
         let fake = FakeWindowSystem()
         let app = fake.addApplication(bundleIdentifier: "a", processIdentifier: 1, name: "A")

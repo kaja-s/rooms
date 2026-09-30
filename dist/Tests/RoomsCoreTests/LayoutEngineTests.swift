@@ -94,7 +94,9 @@ final class LayoutEngineTests: XCTestCase {
 
     func testAvailableLayouts() {
         XCTAssertEqual(LayoutEngine.availableLayouts(windows: windows(3, minWidth: 400), myLayoutFrames: nil, in: area), [.auto, .focus, .columns, .grid, .stack])
-        XCTAssertEqual(LayoutEngine.availableLayouts(windows: windows(3, minWidth: 1000), myLayoutFrames: nil, in: area), [.auto, .stack])
+        XCTAssertEqual(LayoutEngine.availableLayouts(windows: windows(3, minWidth: 1000), myLayoutFrames: nil, in: area), [.auto, .focus, .columns, .grid, .stack])
+        let tooWide = Array(repeating: CGRect(x: 0, y: 0, width: 5000, height: 5000), count: 3)
+        XCTAssertEqual(LayoutEngine.availableLayouts(windows: windows(3, minWidth: 1000), myLayoutFrames: tooWide, in: area), [.auto, .focus, .columns, .grid, .myLayout, .stack])
     }
 
     func testRecognizeWithinTolerance() {

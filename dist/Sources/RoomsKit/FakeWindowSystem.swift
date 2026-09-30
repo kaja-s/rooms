@@ -14,6 +14,18 @@ public final class FakeWindowSystem: WindowSystem {
         public var isMinimized: Bool
         public var isStandard: Bool
         public var isRoomsOwn: Bool
+        /// Milliseconds on the fake clock before a requested frame or size is applied; 0 applies it at once.
+        public var resizeDelayMilliseconds = 0
+        /// When set, size changes are ignored; only the origin of a requested frame is applied.
+        public var ignoresResize = false
+        var pending: (frame: CGRect, at: Int)?
+
+        public static func == (lhs: Window, rhs: Window) -> Bool {
+            lhs.identity == rhs.identity && lhs.applicationName == rhs.applicationName && lhs.title == rhs.title
+                && lhs.frame == rhs.frame && lhs.minimumSize == rhs.minimumSize && lhs.isMinimized == rhs.isMinimized
+                && lhs.isStandard == rhs.isStandard && lhs.isRoomsOwn == rhs.isRoomsOwn
+                && lhs.resizeDelayMilliseconds == rhs.resizeDelayMilliseconds && lhs.ignoresResize == rhs.ignoresResize
+        }
 
         public init(identity: WindowIdentity, applicationName: String, title: String, frame: CGRect, minimumSize: CGSize = .zero, isMinimized: Bool = false, isStandard: Bool = true, isRoomsOwn: Bool = false) {
             self.identity = identity
@@ -69,6 +81,13 @@ public final class FakeWindowSystem: WindowSystem {
         return identity
     }
 
+    /// Makes a window's application apply resizes after `delayMilliseconds` on the fake clock, or ignore them.
+    public func setResizeBehavior(of identity: WindowIdentity, delayMilliseconds: Int = 0, ignoresResize: Bool = false) {
+        guard let i = index(of: identity) else { return }
+        windows[i].resizeDelayMilliseconds = delayMilliseconds
+        windows[i].ignoresResize = ignoresResize
+    }
+
     /// Removes the application and all its windows.
     public func quitApplication(processIdentifier: Int32) {
         applications.removeAll { $0.processIdentifier == processIdentifier }
@@ -118,16 +137,41 @@ public final class FakeWindowSystem: WindowSystem {
     public func setFrame(_ frame: CGRect, of window: WindowIdentity) {
         operations.append(.setFrame(window, frame))
         guard let i = index(of: window) else { return }
-        var applied = frame
-        applied.size.width = max(frame.width, windows[i].minimumSize.width)
-        applied.size.height = max(frame.height, windows[i].minimumSize.height)
-        windows[i].frame = applied
+        request(frame, forWindowAt: i)
     }
 
     public func setSize(_ size: CGSize, of window: WindowIdentity) {
         operations.append(.setSize(window, size))
         guard let i = index(of: window) else { return }
-        windows[i].frame.size = CGSize(width: max(size.width, windows[i].minimumSize.width), height: max(size.height, windows[i].minimumSize.height))
+        let base = windows[i].pending?.frame ?? windows[i].frame
+        request(CGRect(origin: base.origin, size: size), forWindowAt: i)
+    }
+
+    /// Applies a requested frame the way the window's application would: clamped to its minimum size,
+    /// without resizing when it ignores resizes, and after its resize delay on the fake clock.
+    private func request(_ frame: CGRect, forWindowAt i: Int) {
+        var applied = frame
+        if windows[i].ignoresResize {
+            applied.size = windows[i].frame.size
+        } else {
+            applied.size.width = max(frame.width, windows[i].minimumSize.width)
+            applied.size.height = max(frame.height, windows[i].minimumSize.height)
+        }
+        if windows[i].resizeDelayMilliseconds > 0 {
+            windows[i].pending = (applied, waitedMilliseconds + windows[i].resizeDelayMilliseconds)
+        } else {
+            windows[i].pending = nil
+            windows[i].frame = applied
+        }
+    }
+
+    private func applyDueRequests() {
+        for i in windows.indices {
+            if let pending = windows[i].pending, pending.at <= waitedMilliseconds {
+                windows[i].frame = pending.frame
+                windows[i].pending = nil
+            }
+        }
     }
 
     public func isMinimized(_ window: WindowIdentity) -> Bool { self.window(window)?.isMinimized ?? false }
@@ -156,5 +200,8 @@ public final class FakeWindowSystem: WindowSystem {
 
     public func icon(forBundleIdentifier bundleIdentifier: String) -> NSImage? { iconImage }
 
-    public func wait(milliseconds: Int) { waitedMilliseconds += milliseconds }
+    public func wait(milliseconds: Int) {
+        waitedMilliseconds += milliseconds
+        applyDueRequests()
+    }
 }

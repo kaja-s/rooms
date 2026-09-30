@@ -27,9 +27,28 @@ public final class WindowCatalog {
             return window.minimumSize
         }
         system.setSize(CGSize(width: 1, height: 1), of: window.identity)
-        let settled = system.frame(of: window.identity)?.size ?? original.size
+        let settled = settledSize(of: window.identity, original: original.size)
         system.setFrame(original, of: window.identity)
-        return CGSize(width: settled.width.rounded(), height: settled.height.rounded())
+        // A dimension the application did not shrink at all is unknown, so it never blocks a layout.
+        let width = settled.width.rounded() >= original.width.rounded() ? 0 : settled.width.rounded()
+        let height = settled.height.rounded() >= original.height.rounded() ? 0 : settled.height.rounded()
+        return CGSize(width: width, height: height)
+    }
+
+    /// Applications apply a resize with a delay: reads the size every 50 ms until it differs from the original
+    /// size and two reads in a row match, or 500 ms have passed, and returns the last read.
+    private func settledSize(of window: WindowIdentity, original: CGSize) -> CGSize {
+        let interval = 50, limit = 500
+        var waited = 0
+        var last = system.frame(of: window)?.size ?? original
+        while waited < limit {
+            system.wait(milliseconds: interval)
+            waited += interval
+            let next = system.frame(of: window)?.size ?? last
+            if next != original && next == last { return next }
+            last = next
+        }
+        return last
     }
 
     /// Finds each saved window among the open windows; nil for a window that is not found.

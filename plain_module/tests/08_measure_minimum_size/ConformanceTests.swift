@@ -64,4 +64,51 @@ final class MeasureMinimumSizeTests: XCTestCase {
         let measured = h.controller.catalog.measureMinimumSize(of: h.controller.catalog.listWindows()![0])
         XCTAssertEqual(measured, CGSize(width: 1, height: 1))
     }
+
+    func testDelayedResizeIsMeasuredAtItsRealMinimum() {
+        let h = Harness()
+        let x = h.app("x", pid: 1, name: "X")
+        let original = CGRect(x: 100, y: 100, width: 800, height: 600)
+        let w = h.window(x, id: 1, title: "A", frame: original, minimumSize: CGSize(width: 400, height: 300))
+        h.fake.setResizeBehavior(of: w.identity, delayMilliseconds: 120)
+        let measured = h.controller.catalog.measureMinimumSize(of: h.controller.catalog.listWindows()![0])
+        XCTAssertEqual(measured, CGSize(width: 400, height: 300), "not the current 800 by 600")
+        h.fake.wait(milliseconds: 200)
+        XCTAssertEqual(h.fake.frame(of: w.identity), original)
+    }
+
+    func testWindowIgnoringResizeIsMeasuredZero() {
+        let h = Harness()
+        let x = h.app("x", pid: 1, name: "X")
+        let original = CGRect(x: 100, y: 100, width: 800, height: 600)
+        let w = h.window(x, id: 1, title: "A", frame: original)
+        h.fake.setResizeBehavior(of: w.identity, ignoresResize: true)
+        let measured = h.controller.catalog.measureMinimumSize(of: h.controller.catalog.listWindows()![0])
+        XCTAssertEqual(measured, .zero)
+        XCTAssertLessThanOrEqual(h.fake.waitedMilliseconds, 500, "gives up after 500 ms")
+        XCTAssertEqual(h.fake.frame(of: w.identity), original)
+    }
+
+    func testDimensionThatDidNotShrinkIsZero() {
+        let h = Harness()
+        let x = h.app("x", pid: 1, name: "X")
+        let original = CGRect(x: 0, y: 0, width: 900, height: 1073)
+        h.window(x, id: 1, title: "A", frame: original, minimumSize: CGSize(width: 500, height: 1073))
+        let measured = h.controller.catalog.measureMinimumSize(of: h.controller.catalog.listWindows()![0])
+        XCTAssertEqual(measured, CGSize(width: 500, height: 0))
+    }
+
+    func testCorrectedMinimumsLetAutoPickATidyLayout() {
+        let h = Harness()
+        let x = h.app("x", pid: 1, name: "X")
+        let full = CGRect(x: 0, y: 0, width: 700, height: 900)
+        let a = h.window(x, id: 1, title: "A", frame: full, minimumSize: CGSize(width: 400, height: 900))
+        let b = h.window(x, id: 2, title: "B", frame: full, minimumSize: CGSize(width: 400, height: 900))
+        let windows = h.controller.catalog.listWindows()!.map { w -> AppWindow in
+            var m = w; m.minimumSize = h.controller.catalog.measureMinimumSize(of: w); return m
+        }
+        _ = (a, b)
+        XCTAssertEqual(windows.map { $0.minimumSize.height }, [0, 0], "full-height minimums that did not shrink are 0")
+        XCTAssertNotEqual(LayoutEngine.resolve(.auto, windows: windows, myLayoutFrames: nil, in: h.area), .stack)
+    }
 }

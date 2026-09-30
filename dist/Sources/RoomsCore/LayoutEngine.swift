@@ -142,14 +142,11 @@ public enum LayoutEngine {
         return (resolved, frames(for: resolved, count: windows.count, in: area))
     }
 
-    /// The layouts a room can cycle through on this screen, in cycle order.
+    /// The layouts a room can cycle through, in cycle order: every layout whether or not it fits the windows,
+    /// and My Layout only when the room has My Layout frames.
     public static func availableLayouts(windows: [AppWindow], myLayoutFrames: [CGRect]?, in area: CGRect) -> [Layout] {
         Layout.cycleOrder.filter { layout in
-            switch layout {
-            case .auto, .stack: return true
-            case .myLayout: return myLayoutFits(myLayoutFrames, windows: windows, in: area)
-            case .focus, .columns, .grid: return fits(layout, windows: windows, in: area)
-            }
+            layout != .myLayout || !(myLayoutFrames ?? []).isEmpty
         }
     }
 

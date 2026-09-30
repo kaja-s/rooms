@@ -58,6 +58,9 @@
 - [x] `RoomsKit` includes `FakeWindowSystem`, a public in-memory `WindowSystem` whose applications, windows, screens, permission flags, and recorded operations are set and read directly by test code.
   - Verified: Public FakeWindowSystem with recorded operations
 
+- [x] `FakeWindowSystem` can give a window a resize delay in milliseconds, applied on its fake clock advanced by `wait(milliseconds:)`, and can make a window ignore resize requests.
+  Verified: FakeWindowSystem.setResizeBehavior(of:delayMilliseconds:ignoresResize:); pending frames applied when wait(milliseconds:) advances the fake clock past the delay; ignoresResize keeps the size
+
 - [x] `RoomStore` and `AppController` take the JSON file location by injection, defaulting to the Application Support path.
   - Verified: RoomStore(fileURL:), AppController(store:)
 
