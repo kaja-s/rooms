@@ -52,7 +52,7 @@ final class FooterGroupsTests: XCTestCase {
         h.seed([Room(name: "R", windows: [a], layout: .auto)])
         let palette = h.controller.palette
         palette.open()
-        XCTAssertEqual(palette.leadingFooterHints, ["Here: Focus", "⇥ Layout", "⌘S Remember mine", "⌘1–9 Key"])
+        XCTAssertEqual(palette.leadingFooterHints, ["Here: Focus", "⇥ Layout", "⌘S New room", "⌘1–9 Key"])
         XCTAssertEqual(palette.trailingFooterHints, ["↵ Go", "esc Close"])
         XCTAssertEqual(palette.footerHints, palette.leadingFooterHints + palette.trailingFooterHints)
     }
@@ -61,7 +61,7 @@ final class FooterGroupsTests: XCTestCase {
         let h = Harness()
         let palette = h.controller.palette
         palette.open()
-        XCTAssertEqual(palette.leadingFooterHints, ["⇥ Layout", "⌘S Remember mine", "⌘1–9 Key"])
+        XCTAssertEqual(palette.leadingFooterHints, ["⇥ Layout", "⌘S New room", "⌘1–9 Key"])
         palette.query = "New"
         XCTAssertTrue(palette.isCreateRowSelected)
         XCTAssertFalse(palette.leadingFooterHints.contains { $0.hasPrefix("Here:") })

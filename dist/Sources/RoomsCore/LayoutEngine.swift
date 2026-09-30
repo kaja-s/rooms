@@ -13,7 +13,7 @@ public enum LayoutEngine {
 
     // MARK: Frames
 
-    /// Frames for `count` windows in one of Focus, Columns, Grid, or Stack. Returns an empty array for Auto and My Layout.
+    /// Frames for `count` windows in one of Focus, Columns, Grid, or Stack. Returns an empty array for Auto.
     public static func frames(for layout: Layout, count: Int, in area: CGRect) -> [CGRect] {
         guard count > 0 else { return [] }
         switch layout {
@@ -21,7 +21,7 @@ public enum LayoutEngine {
         case .columns: return columnFrames(count: count, in: area)
         case .grid: return gridFrames(count: count, in: area)
         case .stack: return stackFrames(count: count, in: area)
-        case .auto, .myLayout: return []
+        case .auto: return []
         }
     }
 
@@ -88,74 +88,43 @@ public enum LayoutEngine {
     /// A layout fits when every computed frame is at least the window's minimum size; Stack always fits.
     public static func fits(_ layout: Layout, windows: [AppWindow], in area: CGRect) -> Bool {
         switch layout {
-        case .stack:
+        case .stack, .auto:
             return true
-        case .auto:
-            return true
-        case .myLayout:
-            return false
         case .focus, .columns, .grid:
             let computed = frames(for: layout, count: windows.count, in: area)
-            return fits(frames: computed, windows: windows)
+            guard computed.count == windows.count else { return false }
+            return zip(computed, windows).allSatisfy { frame, window in
+                frame.width >= window.minimumSize.width && frame.height >= window.minimumSize.height
+            }
         }
-    }
-
-    /// My Layout fits when every saved frame lies inside the visible area and is at least the window's minimum size.
-    public static func myLayoutFits(_ savedFrames: [CGRect]?, windows: [AppWindow], in area: CGRect) -> Bool {
-        guard let saved = savedFrames, saved.count == windows.count, !saved.isEmpty else { return false }
-        guard saved.allSatisfy({ area.contains($0) }) else { return false }
-        return fits(frames: saved, windows: windows)
-    }
-
-    private static func fits(frames: [CGRect], windows: [AppWindow]) -> Bool {
-        guard frames.count == windows.count else { return false }
-        for (frame, window) in zip(frames, windows) {
-            if frame.width < window.minimumSize.width || frame.height < window.minimumSize.height { return false }
-        }
-        return true
     }
 
     // MARK: Resolution
 
-    /// Resolves Auto (and a non-fitting My Layout) to a concrete layout: Focus, Columns, Grid, Stack, or My Layout.
-    public static func resolve(_ layout: Layout, windows: [AppWindow], myLayoutFrames: [CGRect]?, in area: CGRect) -> Layout {
-        switch layout {
-        case .auto:
-            for candidate in Layout.tidyLayouts where fits(candidate, windows: windows, in: area) {
-                return candidate
-            }
-            return .stack
-        case .myLayout:
-            if myLayoutFits(myLayoutFrames, windows: windows, in: area) { return .myLayout }
-            return resolve(.auto, windows: windows, myLayoutFrames: nil, in: area)
-        case .focus, .columns, .grid, .stack:
-            return layout
-        }
+    /// Resolves Auto to a concrete layout: the first of Focus, Columns, Grid that fits, else Stack.
+    public static func resolve(_ layout: Layout, windows: [AppWindow], in area: CGRect) -> Layout {
+        guard layout == .auto else { return layout }
+        return Layout.tidyLayouts.first { fits($0, windows: windows, in: area) } ?? .stack
     }
 
     /// Resolves the layout and returns the frames for the given windows, one per window in order.
-    public static func frames(for windows: [AppWindow], layout: Layout, myLayoutFrames: [CGRect]?, in area: CGRect) -> (layout: Layout, frames: [CGRect]) {
-        let resolved = resolve(layout, windows: windows, myLayoutFrames: myLayoutFrames, in: area)
-        if resolved == .myLayout, let saved = myLayoutFrames {
-            return (.myLayout, saved)
-        }
+    public static func frames(for windows: [AppWindow], layout: Layout, in area: CGRect) -> (layout: Layout, frames: [CGRect]) {
+        let resolved = resolve(layout, windows: windows, in: area)
         return (resolved, frames(for: resolved, count: windows.count, in: area))
     }
 
-    /// The layouts a room can cycle through, in cycle order: every layout whether or not it fits the windows,
-    /// and My Layout only when the room has My Layout frames.
-    public static func availableLayouts(windows: [AppWindow], myLayoutFrames: [CGRect]?, in area: CGRect) -> [Layout] {
-        Layout.cycleOrder.filter { layout in
-            layout != .myLayout || !(myLayoutFrames ?? []).isEmpty
-        }
-    }
+    /// The layouts a room cycles through with ⇥, in cycle order: every layout, whether or not it fits.
+    public static var availableLayouts: [Layout] { Layout.cycleOrder }
 
     // MARK: Recognition
 
-    /// Returns the tidy layout whose frames match the actual frames within `tolerance` on each edge, or nil.
+    /// The layouts ⌘S recognizes from current frames, in order.
+    public static let recognizableLayouts: [Layout] = [.focus, .columns, .grid, .stack]
+
+    /// Returns the first of Focus, Columns, Grid, Stack whose frames match the actual frames within `tolerance` on each edge, or nil.
     public static func recognize(frames actual: [CGRect], count: Int, in area: CGRect, tolerance: CGFloat = recognitionTolerance) -> Layout? {
         guard actual.count == count, count > 0 else { return nil }
-        for candidate in Layout.tidyLayouts {
+        for candidate in recognizableLayouts {
             let expected = frames(for: candidate, count: count, in: area)
             let allClose = zip(actual, expected).allSatisfy { a, e in
                 abs(a.minX - e.minX) <= tolerance && abs(a.maxX - e.maxX) <= tolerance &&

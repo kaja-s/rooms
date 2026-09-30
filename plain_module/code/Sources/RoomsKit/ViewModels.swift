@@ -145,7 +145,7 @@ public final class PaletteViewModel: ObservableObject {
     public static let returnHint = "↵ Go"
     public static let escapeHint = "esc Close"
     public static let tabHint = "⇥ Layout"
-    public static let rememberHint = "⌘S Remember mine"
+    public static let newRoomHint = "⌘S New room"
     public static let keyHint = "⌘1–9 Key"
     public static let emptyStateText = "No rooms yet. Type a name and press ↵ to create one."
     public static let contextMenu: [ContextMenuItem] = [
@@ -165,6 +165,11 @@ public final class PaletteViewModel: ObservableObject {
     @Published public private(set) var screenArea: CGRect = .zero
     /// Set by ⇥ / ⇧⇥; cleared when the palette opens or closes.
     @Published public private(set) var isPreviewVisible = false
+    /// "Saved as <layout name>", shown in place of the ⌘S hint for `savedHintDuration` after ⌘S.
+    @Published public private(set) var savedHint: String?
+    /// How long the "Saved as" hint stays; tests may shorten it.
+    public var savedHintDuration: TimeInterval = 2
+    private var savedHintGeneration = 0
 
     init(controller: AppController) {
         self.controller = controller
@@ -259,7 +264,7 @@ public final class PaletteViewModel: ObservableObject {
     /// "Here: <resolved layout name>" for the selected room.
     public var hereText: String? {
         guard let room = selectedRoom else { return nil }
-        let resolved = LayoutEngine.resolve(room.layout, windows: room.windows, myLayoutFrames: room.myLayoutFrames, in: screenArea)
+        let resolved = LayoutEngine.resolve(room.layout, windows: room.windows, in: screenArea)
         return "Here: \(resolved.displayName)"
     }
 
@@ -267,7 +272,7 @@ public final class PaletteViewModel: ObservableObject {
     public var leadingFooterHints: [String] {
         var hints: [String] = []
         if let here = hereText { hints.append(here) }
-        hints += [PaletteViewModel.tabHint, PaletteViewModel.rememberHint, PaletteViewModel.keyHint]
+        hints += [PaletteViewModel.tabHint, savedHint ?? PaletteViewModel.newRoomHint, PaletteViewModel.keyHint]
         return hints
     }
 
@@ -285,7 +290,7 @@ public final class PaletteViewModel: ObservableObject {
     /// when the Create row is selected, or when nothing is selected. Cards use the room's saved windows.
     public var preview: LayoutPreview? {
         guard isVisible, isPreviewVisible, let room = selectedRoom else { return nil }
-        let (layout, frames) = LayoutEngine.frames(for: room.windows, layout: room.layout, myLayoutFrames: room.myLayoutFrames, in: screenArea)
+        let (layout, frames) = LayoutEngine.frames(for: room.windows, layout: room.layout, in: screenArea)
         let cards = zip(room.windows, frames).map { window, frame in
             LayoutPreviewCard(id: window.identity,
                               applicationName: window.applicationName,
@@ -347,8 +352,7 @@ public final class PaletteViewModel: ObservableObject {
 
     public func pressTab(shift: Bool = false) {
         guard let room = selectedRoom else { return }
-        let available = LayoutEngine.availableLayouts(windows: room.windows, myLayoutFrames: room.myLayoutFrames, in: screenArea)
-        guard !available.isEmpty else { return }
+        let available = LayoutEngine.availableLayouts
         let position = available.firstIndex(of: room.layout) ?? -1
         let next: Layout
         if shift {
@@ -361,9 +365,18 @@ public final class PaletteViewModel: ObservableObject {
         objectWillChange.send()
     }
 
+    /// ⌘S: saves the windows visible on the current screen as a new room and selects its row; the palette stays open.
     public func pressCommandS() {
-        guard let room = selectedRoom else { return }
-        controller.rememberArrangement(ofRoom: room.id)
+        guard let room = controller.saveVisibleWindowsAsNewRoom() else { return }
+        if !rows.contains(where: { $0.roomID == room.id }) { query = "" }
+        if let index = rows.firstIndex(where: { $0.roomID == room.id }) { selectedIndex = index }
+        savedHint = "Saved “\(room.name)”"
+        savedHintGeneration += 1
+        let generation = savedHintGeneration
+        DispatchQueue.main.asyncAfter(deadline: .now() + savedHintDuration) { [weak self] in
+            guard let self, self.savedHintGeneration == generation else { return }
+            self.savedHint = nil
+        }
         objectWillChange.send()
     }
 

@@ -141,12 +141,29 @@ final class PaletteViewModelTests: XCTestCase {
         let x = h.app("x", pid: 1, name: "X")
         let a = h.window(x, id: 1, title: "A", minimumSize: CGSize(width: 1000, height: 100))
         let b = h.window(x, id: 2, title: "B", minimumSize: CGSize(width: 1000, height: 100))
-        h.seed([Room(name: "R", windows: [a, b], layout: .auto, myLayoutFrames: [CGRect(x: 8, y: 8, width: 1000, height: 400), CGRect(x: 8, y: 450, width: 1000, height: 400)])])
+        h.seed([Room(name: "R", windows: [a, b], layout: .auto)])
         let palette = h.controller.palette
         palette.open()
         var seen: [Layout] = []
-        for _ in 0..<6 { palette.pressTab(); seen.append(h.controller.rooms[0].layout) }
-        XCTAssertEqual(seen, [.focus, .columns, .grid, .myLayout, .stack, .auto])
+        for _ in 0..<5 { palette.pressTab(); seen.append(h.controller.rooms[0].layout) }
+        XCTAssertEqual(seen, [.focus, .columns, .grid, .stack, .auto])
+    }
+
+    func testCommandSSavesVisibleWindowsAsNewSelectedRoom() {
+        let (h, _) = seeded()
+        let palette = h.controller.palette
+        palette.open()
+        palette.query = "Deep"
+        let before = h.controller.rooms.count
+        palette.pressCommandS()
+        XCTAssertEqual(h.controller.rooms.count, before + 1)
+        let room = h.controller.rooms.last!
+        XCTAssertEqual(room.name, "Room 1")
+        XCTAssertEqual(h.controller.currentRoomID, room.id)
+        XCTAssertTrue(palette.isVisible, "the palette stays open")
+        XCTAssertEqual(palette.rows[palette.selectedIndex].roomID, room.id, "the new row is selected, even when the typed text hid it")
+        XCTAssertEqual(palette.savedHint, "Saved “Room 1”")
+        XCTAssertTrue(palette.leadingFooterHints.contains("Saved “Room 1”"))
     }
 
     func testCommandKeys() {
@@ -159,9 +176,7 @@ final class PaletteViewModelTests: XCTestCase {
         palette.pressCommandDigit(5)
         XCTAssertNil(h.controller.room(rooms[0].id)?.directKey)
         XCTAssertTrue(palette.footerHints.contains(PaletteViewModel.keyHint))
-        XCTAssertTrue(palette.footerHints.contains(PaletteViewModel.rememberHint))
-        palette.pressCommandS() // not current: nothing
-        XCTAssertEqual(h.controller.room(rooms[0].id)?.layout, .auto)
+        XCTAssertTrue(palette.footerHints.contains(PaletteViewModel.newRoomHint))
         palette.pressCommandDelete()
         XCTAssertEqual(h.controller.rooms.count, 2)
         XCTAssertEqual(palette.rows.map { $0.title }, ["Daily Build", "Deep Work"])
@@ -249,7 +264,7 @@ extension PaletteViewModelTests {
         let h = TestHarness()
         let palette = h.controller.palette
         palette.open()
-        XCTAssertEqual(palette.leadingFooterHints, ["⇥ Layout", "⌘S Remember mine", "⌘1–9 Key"])
+        XCTAssertEqual(palette.leadingFooterHints, ["⇥ Layout", "⌘S New room", "⌘1–9 Key"])
         XCTAssertEqual(palette.trailingFooterHints, ["↵ Go", "esc Close"])
         XCTAssertEqual(palette.footerHints, palette.leadingFooterHints + palette.trailingFooterHints)
         let x = h.app("x", pid: 1, name: "X")

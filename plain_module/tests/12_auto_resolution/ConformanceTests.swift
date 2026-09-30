@@ -52,12 +52,12 @@ final class AutoResolutionTests: XCTestCase {
     }
 
     func testAcceptanceMinWidth400ResolvesToFocus() {
-        XCTAssertEqual(LayoutEngine.resolve(.auto, windows: windows(3, minWidth: 400), myLayoutFrames: nil, in: area), .focus)
+        XCTAssertEqual(LayoutEngine.resolve(.auto, windows: windows(3, minWidth: 400), in: area), .focus)
     }
 
     func testAcceptanceMinWidth1000ResolvesToStack() {
         let w = windows(3, minWidth: 1000)
-        XCTAssertEqual(LayoutEngine.resolve(.auto, windows: w, myLayoutFrames: nil, in: area), .stack)
+        XCTAssertEqual(LayoutEngine.resolve(.auto, windows: w, in: area), .stack)
         for layout in [Layout.focus, .columns, .grid] {
             let narrowest = LayoutEngine.frames(for: layout, count: 3, in: area).map { $0.width }.min()!
             XCTAssertLessThan(narrowest, 1000, "\(layout.displayName) leaves a frame narrower than 1000")
@@ -65,22 +65,23 @@ final class AutoResolutionTests: XCTestCase {
     }
 
     func testOrderFocusColumnsGrid() {
-        XCTAssertEqual(LayoutEngine.resolve(.auto, windows: windows(3, minWidth: 600), myLayoutFrames: nil, in: area), .grid)
-        XCTAssertEqual(LayoutEngine.resolve(.auto, windows: windows(2, minWidth: 600, minHeight: 800), myLayoutFrames: nil, in: area), .columns)
+        XCTAssertEqual(LayoutEngine.resolve(.auto, windows: windows(3, minWidth: 600), in: area), .grid)
+        XCTAssertEqual(LayoutEngine.resolve(.auto, windows: windows(2, minWidth: 600, minHeight: 800), in: area), .columns)
     }
 
-    func testMyLayoutFitsOrFallsBackToAuto() {
-        let saved = [CGRect(x: 10, y: 10, width: 700, height: 500), CGRect(x: 720, y: 10, width: 700, height: 500)]
-        XCTAssertEqual(LayoutEngine.resolve(.myLayout, windows: windows(2, minWidth: 400), myLayoutFrames: saved, in: area), .myLayout)
-        let outside = [CGRect(x: 10, y: 10, width: 700, height: 500), CGRect(x: 1000, y: 10, width: 700, height: 500)]
-        XCTAssertEqual(LayoutEngine.resolve(.myLayout, windows: windows(2, minWidth: 400), myLayoutFrames: outside, in: area), .focus)
-        XCTAssertEqual(LayoutEngine.resolve(.myLayout, windows: windows(2, minWidth: 705), myLayoutFrames: saved, in: area), .columns)
-        XCTAssertEqual(LayoutEngine.resolve(.myLayout, windows: windows(2, minWidth: 400), myLayoutFrames: nil, in: area), .focus)
+    func testLegacyMyLayoutLoadsAsAuto() throws {
+        let json = #"[{"id":"BC800FEA-A050-4A1B-88BE-8480B1164654","name":"test","windows":[],"layout":"myLayout","myLayoutFrames":[[[0,0],[10,10]]],"createdAt":"2026-09-30T12:58:16Z"}]"#
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("legacy-\(UUID().uuidString).json")
+        try Data(json.utf8).write(to: url)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let rooms = RoomStore(fileURL: url).load()
+        XCTAssertEqual(rooms.map { $0.name }, ["test"])
+        XCTAssertEqual(rooms.first?.layout, .auto)
     }
 
     func testConcreteLayoutsResolveToThemselves() {
         for layout in [Layout.focus, .columns, .grid, .stack] {
-            XCTAssertEqual(LayoutEngine.resolve(layout, windows: windows(3, minWidth: 5000), myLayoutFrames: nil, in: area), layout)
+            XCTAssertEqual(LayoutEngine.resolve(layout, windows: windows(3, minWidth: 5000), in: area), layout)
         }
     }
 }

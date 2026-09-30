@@ -85,7 +85,7 @@ final class EditWindowsTests: XCTestCase {
         let a = h.window(x, id: 1, title: "A", minimumSize: CGSize(width: 111, height: 100))
         let b = h.window(x, id: 2, title: "B", minimumSize: CGSize(width: 222, height: 100))
         let c = h.window(x, id: 3, title: "C", minimumSize: CGSize(width: 333, height: 100))
-        h.seed([Room(name: "Design", windows: [a, b], layout: .myLayout, myLayoutFrames: [CGRect(x: 8, y: 8, width: 500, height: 500), CGRect(x: 520, y: 8, width: 500, height: 500)])])
+        h.seed([Room(name: "Design", windows: [a, b], layout: .focus)])
         let id = h.controller.rooms[0].id
         h.controller.beginEditWindows(ofRoom: id)
         let picker = h.controller.picker
@@ -98,13 +98,11 @@ final class EditWindowsTests: XCTestCase {
         var room = h.controller.room(id)!
         XCTAssertEqual(room.windows.map { $0.title }, ["B", "A"])
         XCTAssertEqual(room.windows.map { $0.minimumSize.width }, [222, 111], "minimum sizes measured again")
-        XCTAssertNotNil(room.myLayoutFrames, "same set of windows keeps My Layout frames")
         h.controller.beginEditWindows(ofRoom: id)
         h.controller.picker.toggleCard(at: 2) // add C
         h.controller.picker.confirm()
         room = h.controller.room(id)!
         XCTAssertEqual(room.windows.map { $0.title }, ["B", "A", "C"])
-        XCTAssertNil(room.myLayoutFrames, "changed set drops My Layout frames")
         XCTAssertEqual(h.reload()[0].windows.map { $0.title }, ["B", "A", "C"])
         XCTAssertEqual(h.reload()[0].windows.map { $0.minimumSize.width }, [222, 111, 333])
     }

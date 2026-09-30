@@ -78,20 +78,22 @@ All scenarios drive `AppController` and its view models through `FakeWindowSyste
 - S11.7 fits(): true iff every frame ≥ window's minimum size; Stack always fits.
 - S11.8 Frames are integral (whole points).
 
-## FS12 — Auto and My Layout resolution
+## FS12 — Auto resolution
 - S12.1 Auto → first of Focus, Columns, Grid that fits; else Stack.
-- S12.2 My Layout fits iff every saved frame lies inside the visible area and ≥ minimum size; otherwise, or with no saved frames, Auto is resolved instead.
+- S12.2 A stored `myLayout` value loads as Auto and stored `myLayoutFrames` are ignored (legacy rooms.json).
 - AT12.a Three windows min width 400 on 1440×900 → Focus.
 - AT12.b Three windows min width 1000 on 1440×900 → Stack; Focus/Columns/Grid each have a frame narrower than 1000.
 
 ## FS13 — Showing a room
 - S13.1 ↵ on a room row (or `clickRow`) closes the palette and shows the room.
-- S13.2 Windows not found are skipped.
-- S13.3 Frames from the room's layout on the current screen; Auto/My Layout resolved; My Layout uses saved frames.
-- S13.4 Each found window is unminimized, moved, raised; main raised last and focused; if main missing, first found window gets focus.
-- S13.5 No window found → nothing moved, notification "None of the windows in “<name>” are open" recorded.
+- S13.2 A room opens only when all its saved windows are found (see S13.5).
+- S13.3 Frames from the room's layout on the current screen; Auto resolved.
 - AT13.a Focus room, three windows, 1440×900: window 1 at left two-thirds frame, 2 and 3 stacked in right third; window 2 was minimized and is unminimized; window 1 raised last with focus.
-- AT13.b Room whose app quit → no moves, notification with the room's name.
+- S13.4 Every saved window must be found; the main window is raised last and focused.
+- S13.5 Any saved window not found (application quit, or window closed while the app runs) → nothing moved/hidden/raised, CurrentRoom unchanged, notification "Open <apps>, then open “<name>” again"; apps of the unfound windows, each once in room order, joined ", " with a final " and ".
+- S13.6 The same check applies to ⌃⌥1–9 direct keys.
+- AT13.b Design (Figma, Linear, Dia): Figma quit → "Open Figma, then open “Design” again"; Figma and Linear quit → "Open Figma and Linear, then open “Design” again".
+- AT13.c Figma window closed while Figma runs → no moves, "Open Figma, then open “Design” again".
 
 ## FS14 — Showing hides everything else
 - S14.1 Apps with no found window in the room are hidden.
@@ -107,11 +109,11 @@ All scenarios drive `AppController` and its view models through `FakeWindowSyste
 - S16.1 After Create Room, the new room is the current room and its windows have been laid out (fake recorded moves).
 
 ## FS17 — Tab cycles layouts
-- S17.1 Cycle order Auto, Focus, Columns, Grid, My Layout, Stack; every layout is offered whether or not it fits the room's windows; My Layout is offered whenever the room has My Layout frames and skipped without them; wraps around; ⇧⇥ goes backwards.
+- S17.1 Cycle order Auto, Focus, Columns, Grid, Stack; every layout offered whether or not it fits; wraps around; ⇧⇥ goes backwards.
 - S17.2 Change persisted immediately.
 - S17.3 If the selected room is current, its windows move immediately to new frames.
 - S17.4 Footer shows "Here: <resolved layout>" (Auto shows the resolved concrete layout) and hint "⇥ Layout".
-- AT17.a Auto room, three windows, no My Layout frames: ⇥ ×5 → Focus, Columns, Grid, Stack, Auto; then ⇧⇥ → Stack; each state persisted on disk.
+- AT17.a Auto room, three windows: ⇥ ×5 → Focus, Columns, Grid, Stack, Auto; then ⇧⇥ → Stack; each state persisted on disk.
 - AT17.b Auto room, three windows of minimum width 1000 on 1440×900: ⇥ ×4 → Focus, Columns, Grid, Stack (nothing skipped).
 - S17.5 Choosing a layout a window cannot shrink into still moves the windows to that layout's frames; the application keeps the size it settles on.
 
@@ -129,13 +131,17 @@ All scenarios drive `AppController` and its view models through `FakeWindowSyste
 - S19.2 Repeating ⌃⌥← while in left half → left third → left two-thirds → back to half (same for →).
 - S19.3 Uses the focused window of the fake.
 
-## FS20 — ⌘S tidy recognition
-- S20.1 Selected room is current and frames within 24 pt per edge of Focus/Columns/Grid frames → layout set to that layout, windows moved to exact frames, persisted.
-- S20.2 Selected room not current → ⌘S does nothing (no writes, no moves).
-- S20.3 Footer hint "⌘S Remember mine".
-
-## FS21 — ⌘S My Layout
-- S21.1 No tidy match → frames snapped to a 16-pt grid; edges within 16 pt of each other get exactly an 8-pt gap; saved as My Layout frames; layout = My Layout; windows moved to snapped frames; persisted.
+## FS20 — ⌘S saves visible windows as a new room
+- S20.1 New room named "Room n", smallest n ≥ 1 not used by any room, case-insensitive ("Room 1", "room 3" → "Room 2").
+- S20.2 Windows: listed on the current screen, not minimized, app not hidden, not Rooms' own; front to back, frontmost is place 1. Minimum sizes measured.
+- S20.3 Layout: first of Focus, Columns, Grid, Stack whose frames are within 24 pt per edge of current frames; otherwise Auto. No window moved.
+- S20.4 Room appended and persisted; becomes CurrentRoom; its row is selected; the palette stays open.
+- S20.5 No window visible on the current screen → nothing saved, hint unchanged.
+- S20.6 Works with any selection, including the Create row and an empty RoomList.
+- S20.7 Hint "⌘S New room"; after ⌘S "Saved “Room n”" for 2 seconds, then back.
+- AT20.a "Room 1", "room 3" exist; three windows near Columns → "Room 2", Columns, windows front to back, current, selected, hint "Saved “Room 2”", on disk.
+- AT20.b Two windows in no tidy arrangement → new room on Auto; neither window moved.
+- AT20.c Minimized window and hidden app's window are excluded.
 
 ## FS22 — Context menu and row buttons
 - S22.1 `contextMenuItems(for:)` = Edit Windows…, Rename…, Delete.
@@ -157,7 +163,7 @@ All scenarios drive `AppController` and its view models through `FakeWindowSyste
 ## FS25 — Edit Windows
 - S25.1 Picker in edit mode: title "Edit the windows of “<name>”", button Save Room; found windows preselected in room order; not-found windows omitted.
 - S25.2 Clicking a selected card removes it; clicking again appends at end.
-- S25.3 Save Room replaces windows in badge order, re-measures minimum sizes, drops My Layout frames iff the window set changed (kept when the same set is reordered? "set" changed → reorder keeps frames), persists, closes.
+- S25.3 Save Room replaces windows in badge order, re-measures minimum sizes, persists, closes.
 - S25.4 If the room is current, it is shown again after saving.
 
 ## FS26 — ⌘1–9 direct keys
@@ -175,7 +181,7 @@ All scenarios drive `AppController` and its view models through `FakeWindowSyste
 
 
 ## FS29 — Footer key hints in one row, two groups
-- S29.1 With a room selected, the left group is ["Here: <resolved layout>", "⇥ Layout", "⌘S Remember mine", "⌘1–9 Key"] in that order.
+- S29.1 With a room selected, the left group is ["Here: <resolved layout>", "⇥ Layout", "⌘S New room", "⌘1–9 Key"] in that order.
 - S29.2 The right group is ["↵ Go", "esc Close"] and is rendered in a lighter color than the left group.
 - S29.3 "Here: …" is omitted when no room is selected (empty list, or the Create row selected); the other left hints remain.
 - S29.4 The tab hint starts with "⇥" and the view renders it as an arrow-to-bar symbol followed by "Layout".

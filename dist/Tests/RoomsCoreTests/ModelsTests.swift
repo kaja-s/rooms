@@ -3,8 +3,8 @@ import XCTest
 
 final class ModelsTests: XCTestCase {
     func testLayoutNamesAndOrders() {
-        XCTAssertEqual(Layout.allCases.map { $0.displayName }, ["Auto", "Focus", "Columns", "Grid", "My Layout", "Stack"])
-        XCTAssertEqual(Layout.cycleOrder, [.auto, .focus, .columns, .grid, .myLayout, .stack])
+        XCTAssertEqual(Layout.allCases.map { $0.displayName }, ["Auto", "Focus", "Columns", "Grid", "Stack"])
+        XCTAssertEqual(Layout.cycleOrder, [.auto, .focus, .columns, .grid, .stack])
         XCTAssertEqual(Layout.tidyLayouts, [.focus, .columns, .grid])
     }
 
@@ -13,7 +13,13 @@ final class ModelsTests: XCTestCase {
         XCTAssertEqual(room.layout, .auto)
         XCTAssertNil(room.directKey)
         XCTAssertNil(room.lastShown)
-        XCTAssertNil(room.myLayoutFrames)
+    }
+
+    func testLegacyMyLayoutLoadsAsAutoAndFramesAreIgnored() throws {
+        let json = #"{"id":"BC800FEA-A050-4A1B-88BE-8480B1164654","name":"test","windows":[],"layout":"myLayout","myLayoutFrames":[[[0,0],[10,10]]],"createdAt":0}"#
+        let room = try JSONDecoder().decode(Room.self, from: Data(json.utf8))
+        XCTAssertEqual(room.layout, .auto)
+        XCTAssertThrowsError(try JSONDecoder().decode(Layout.self, from: Data(#""bogus""#.utf8)))
     }
 
     func testAppWindowCodable() throws {

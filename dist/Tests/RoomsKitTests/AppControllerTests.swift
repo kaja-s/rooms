@@ -50,14 +50,31 @@ final class AppControllerTests: XCTestCase {
         XCTAssertEqual(h.fake.windows.count, 4)
     }
 
-    func testShowRoomWithNothingOpenNotifies() {
+    func testShowRoomWithQuitApplicationAsksToOpenIt() {
         let h = TestHarness()
         let x = h.app("x", pid: 1, name: "X")
         let a = h.window(x, id: 1, title: "A")
         h.seed([Room(name: "Gone", windows: [a])])
         h.fake.quitApplication(processIdentifier: 1)
         h.controller.showRoom(id: h.controller.rooms[0].id)
-        XCTAssertEqual(h.controller.notificationMessage, "None of the windows in “Gone” are open")
+        XCTAssertEqual(h.controller.notificationMessage, "Open X, then open “Gone” again")
+        XCTAssertTrue(h.fake.operations.isEmpty)
+        XCTAssertNil(h.controller.currentRoomID)
+    }
+
+    func testJoinedNames() {
+        XCTAssertEqual(AppController.joinedNames(["A"]), "A")
+        XCTAssertEqual(AppController.joinedNames(["A", "B"]), "A and B")
+        XCTAssertEqual(AppController.joinedNames(["A", "B", "C"]), "A, B and C")
+    }
+
+    func testShowRoomWithClosedWindowAsksToOpenItsApp() {
+        let h = TestHarness()
+        let x = h.app("x", pid: 1, name: "X")
+        let a = AppWindow(identity: WindowIdentity(bundleIdentifier: x.bundleIdentifier, processIdentifier: 1, windowID: 77), applicationName: "X", title: "Closed", frame: .zero)
+        h.seed([Room(name: "Gone", windows: [a])])
+        h.controller.showRoom(id: h.controller.rooms[0].id)
+        XCTAssertEqual(h.controller.notificationMessage, "Open X, then open “Gone” again")
         XCTAssertTrue(h.fake.operations.isEmpty)
         XCTAssertNil(h.controller.currentRoomID)
     }
@@ -129,49 +146,42 @@ final class AppControllerTests: XCTestCase {
         XCTAssertTrue(h.fake.operations.isEmpty)
     }
 
-    func testRememberArrangementRecognizesTidyLayout() {
+    func testSaveVisibleWindowsRecognizesColumnsWithoutMovingAndNamesRoom() {
         let h = TestHarness()
         let x = h.app("x", pid: 1, name: "X")
-        let a = h.window(x, id: 1, title: "A")
-        let b = h.window(x, id: 2, title: "B")
-        h.seed([Room(name: "R", windows: [a, b], layout: .auto)])
-        let id = h.controller.rooms[0].id
-        h.controller.showRoom(id: id)
         let columns = LayoutEngine.frames(for: .columns, count: 2, in: h.fake.visibleArea)
-        h.fake.setFrame(columns[0].offsetBy(dx: 10, dy: 0), of: a.identity)
-        h.fake.setFrame(columns[1].offsetBy(dx: -15, dy: 5), of: b.identity)
-        h.controller.rememberArrangement(ofRoom: id)
-        XCTAssertEqual(h.controller.room(id)?.layout, .columns)
-        XCTAssertEqual(h.fake.frame(of: a.identity), columns[0])
-        XCTAssertEqual(h.reload()[0].layout, .columns)
+        let a = h.window(x, id: 1, title: "A", frame: columns[0].offsetBy(dx: 10, dy: 0))
+        let b = h.window(x, id: 2, title: "B", frame: columns[1].offsetBy(dx: -15, dy: 5))
+        h.seed([Room(name: "Room 1", windows: [a]), Room(name: "room 3", windows: [a])])
+        h.fake.clearOperations()
+        let room = h.controller.saveVisibleWindowsAsNewRoom()!
+        XCTAssertEqual(room.name, "Room 2")
+        XCTAssertEqual(room.layout, .columns)
+        XCTAssertEqual(room.windows.map { $0.identity }, [a.identity, b.identity])
+        XCTAssertEqual(h.controller.currentRoomID, room.id)
+        XCTAssertEqual(h.fake.frame(of: a.identity), columns[0].offsetBy(dx: 10, dy: 0), "no window moves")
+        XCTAssertFalse(h.fake.operations.contains { if case .setFrame(_, let f) = $0 { return f != columns[0].offsetBy(dx: 10, dy: 0) && f != columns[1].offsetBy(dx: -15, dy: 5) } else { return false } })
+        XCTAssertEqual(h.reload().last?.name, "Room 2")
     }
 
-    func testRememberArrangementSavesMyLayout() {
+    func testSaveVisibleWindowsSkipsMinimizedHiddenAndOffScreen() {
         let h = TestHarness()
         let x = h.app("x", pid: 1, name: "X")
-        let a = h.window(x, id: 1, title: "A", minimumSize: CGSize(width: 50, height: 50))
-        let b = h.window(x, id: 2, title: "B", minimumSize: CGSize(width: 50, height: 50))
-        h.seed([Room(name: "R", windows: [a, b], layout: .auto)])
-        let id = h.controller.rooms[0].id
-        h.controller.showRoom(id: id)
-        h.fake.setFrame(CGRect(x: 13, y: 21, width: 300, height: 200), of: a.identity)
-        h.fake.setFrame(CGRect(x: 700, y: 500, width: 300, height: 200), of: b.identity)
-        h.controller.rememberArrangement(ofRoom: id)
-        let room = h.controller.room(id)!
-        XCTAssertEqual(room.layout, .myLayout)
-        XCTAssertEqual(room.myLayoutFrames?[0], CGRect(x: 16, y: 16, width: 304, height: 208))
-        XCTAssertEqual(h.fake.frame(of: a.identity), CGRect(x: 16, y: 16, width: 304, height: 208))
-        XCTAssertEqual(h.reload()[0].myLayoutFrames?.count, 2)
-    }
-
-    func testRememberArrangementIgnoresNonCurrentRoom() {
-        let h = TestHarness()
-        let x = h.app("x", pid: 1, name: "X")
+        let y = h.app("y", pid: 2, name: "Y")
         let a = h.window(x, id: 1, title: "A")
-        h.seed([Room(name: "R", windows: [a], layout: .auto)])
-        h.controller.rememberArrangement(ofRoom: h.controller.rooms[0].id)
-        XCTAssertEqual(h.controller.rooms[0].layout, .auto)
-        XCTAssertTrue(h.fake.operations.isEmpty)
+        h.window(x, id: 2, title: "Min", minimized: true)
+        h.window(y, id: 3, title: "Hidden")
+        h.window(x, id: 4, title: "Off", frame: CGRect(x: 5000, y: 100, width: 400, height: 300))
+        h.fake.setHidden(true, application: 2)
+        let room = h.controller.saveVisibleWindowsAsNewRoom()!
+        XCTAssertEqual(room.windows.map { $0.identity }, [a.identity])
+        XCTAssertEqual(room.layout, .auto)
+    }
+
+    func testSaveVisibleWindowsWithNothingVisibleSavesNothing() {
+        let h = TestHarness()
+        XCTAssertNil(h.controller.saveVisibleWindowsAsNewRoom())
+        XCTAssertTrue(h.controller.rooms.isEmpty)
     }
 
     func testSetLayoutRelayoutsCurrentRoom() {
@@ -187,19 +197,15 @@ final class AppControllerTests: XCTestCase {
         XCTAssertEqual(h.reload()[0].layout, .columns)
     }
 
-    func testReplaceWindowsDropsMyLayoutFramesWhenSetChanges() {
+    func testReplaceWindowsReplacesAndMeasures() {
         let h = TestHarness()
         let x = h.app("x", pid: 1, name: "X")
         let a = h.window(x, id: 1, title: "A")
         let b = h.window(x, id: 2, title: "B")
         let c = h.window(x, id: 3, title: "C")
-        let frames = [CGRect(x: 8, y: 8, width: 400, height: 400), CGRect(x: 500, y: 8, width: 400, height: 400)]
-        h.seed([Room(name: "R", windows: [a, b], layout: .myLayout, myLayoutFrames: frames)])
+        h.seed([Room(name: "R", windows: [a, b], layout: .focus)])
         let id = h.controller.rooms[0].id
-        h.controller.replaceWindows(ofRoom: id, with: [b, a])
-        XCTAssertEqual(h.controller.room(id)?.myLayoutFrames, frames, "reordering the same set keeps the frames")
         h.controller.replaceWindows(ofRoom: id, with: [a, c])
-        XCTAssertNil(h.controller.room(id)?.myLayoutFrames)
         XCTAssertEqual(h.controller.room(id)?.windows.map { $0.identity.windowID }, [1, 3])
         XCTAssertEqual(h.controller.room(id)?.windows[0].minimumSize, CGSize(width: 300, height: 200))
     }

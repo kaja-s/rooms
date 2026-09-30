@@ -82,45 +82,83 @@ final class ShowRoomTests: XCTestCase {
         XCTAssertEqual(h.fake.focusedWindowIdentity, a.identity)
     }
 
-    func testMissingWindowsAreSkippedAndFirstFoundGetsFocus() {
+    func testClosedMainWindowStopsTheRoom() {
         let h = Harness()
         let x = h.app("x", pid: 1, name: "X")
-        let y = h.app("y", pid: 2, name: "Y")
-        let main = h.window(y, id: 9, title: "Main")
+        h.app("y", pid: 2, name: "Y")
+        // The main window was closed, but its application still runs.
+        let main = AppWindow(identity: WindowIdentity(bundleIdentifier: "y", processIdentifier: 2, windowID: 9), applicationName: "Y", title: "Main", frame: .zero)
         let a = h.window(x, id: 1, title: "A")
-        let b = h.window(x, id: 2, title: "B")
-        h.seed([Room(name: "R", windows: [main, a, b], layout: .columns)])
-        h.fake.quitApplication(processIdentifier: 2)
+        h.seed([Room(name: "R", windows: [main, a], layout: .columns)])
+        h.fake.clearOperations()
         h.controller.showRoom(id: h.controller.rooms[0].id)
-        let frames = LayoutEngine.frames(for: .columns, count: 2, in: h.area)
-        XCTAssertEqual(h.fake.frame(of: a.identity), frames[0])
-        XCTAssertEqual(h.fake.frame(of: b.identity), frames[1])
-        XCTAssertEqual(h.fake.focusedByOperation, a.identity)
+        XCTAssertEqual(h.controller.notificationMessage, "Open Y, then open “R” again")
+        XCTAssertTrue(h.fake.operations.isEmpty)
+        XCTAssertEqual(h.fake.frame(of: a.identity), CGRect(x: 100, y: 100, width: 800, height: 600))
     }
 
-    func testAutoAndMyLayoutAreResolved() {
+    func testAutoIsResolved() {
         let h = Harness()
         let x = h.app("x", pid: 1, name: "X")
         let a = h.window(x, id: 1, title: "A", minimumSize: CGSize(width: 1000, height: 100))
         let b = h.window(x, id: 2, title: "B", minimumSize: CGSize(width: 1000, height: 100))
-        h.seed([Room(name: "Auto", windows: [a, b], layout: .auto),
-                Room(name: "Mine", windows: [a, b], layout: .myLayout, myLayoutFrames: [CGRect(x: 8, y: 400, width: 1100, height: 400), CGRect(x: 8, y: 8, width: 1200, height: 380)])])
+        h.seed([Room(name: "Auto", windows: [a, b], layout: .auto)])
         h.controller.showRoom(id: h.controller.rooms[0].id)
         XCTAssertEqual(h.fake.frame(of: a.identity), LayoutEngine.frames(for: .stack, count: 2, in: h.area)[0])
-        h.controller.showRoom(id: h.controller.rooms[1].id)
-        XCTAssertEqual(h.fake.frame(of: a.identity), CGRect(x: 8, y: 400, width: 1100, height: 400))
-        XCTAssertEqual(h.fake.frame(of: b.identity), CGRect(x: 8, y: 8, width: 1200, height: 380))
     }
 
-    func testAcceptanceQuitApplicationShowsNotification() {
+    private func seedDesign(_ h: Harness) -> (UUID, [AppWindow]) {
+        let figma = h.app("com.figma.Desktop", pid: 1, name: "Figma")
+        let linear = h.app("com.linear", pid: 2, name: "Linear")
+        let dia = h.app("company.thebrowser.dia", pid: 3, name: "Dia")
+        let windows = [h.window(figma, id: 1, title: "File"), h.window(linear, id: 2, title: "Issues"), h.window(dia, id: 3, title: "Docs")]
+        h.seed([Room(name: "Design", windows: windows, layout: .columns)])
+        return (h.controller.rooms[0].id, windows)
+    }
+
+    func testAcceptanceQuitApplicationAsksToOpenIt() {
         let h = Harness()
-        let x = h.app("x", pid: 1, name: "X")
-        let a = h.window(x, id: 1, title: "A")
-        h.seed([Room(name: "Ghost Town", windows: [a])])
+        let (id, windows) = seedDesign(h)
         h.fake.quitApplication(processIdentifier: 1)
-        h.app("y", pid: 2, name: "Y")
+        h.fake.clearOperations()
+        h.controller.showRoom(id: id)
+        XCTAssertEqual(h.controller.notificationMessage, "Open Figma, then open “Design” again")
+        XCTAssertTrue(h.fake.operations.isEmpty, "nothing moved, hidden, or raised")
+        XCTAssertEqual(h.fake.frame(of: windows[1].identity), CGRect(x: 100, y: 100, width: 800, height: 600))
+        XCTAssertNil(h.controller.currentRoomID)
+    }
+
+    func testAcceptanceTwoQuitApplicationsAreJoined() {
+        let h = Harness()
+        let (id, _) = seedDesign(h)
+        h.fake.quitApplication(processIdentifier: 1)
+        h.fake.quitApplication(processIdentifier: 2)
+        h.controller.showRoom(id: id)
+        XCTAssertEqual(h.controller.notificationMessage, "Open Figma and Linear, then open “Design” again")
+    }
+
+    func testDirectKeyUsesTheSameCheck() {
+        let h = Harness()
+        let (id, _) = seedDesign(h)
+        h.controller.assignDirectKey(4, toRoom: id)
+        h.fake.quitApplication(processIdentifier: 3)
+        h.controller.directKeyPressed(4)
+        XCTAssertEqual(h.controller.notificationMessage, "Open Dia, then open “Design” again")
+    }
+
+    func testAcceptanceClosedWindowWhileAppRunsAsksToOpenIt() {
+        let h = Harness()
+        let figma = h.app("com.figma.Desktop", pid: 1, name: "Figma")
+        let linear = h.app("com.linear", pid: 2, name: "Linear")
+        let dia = h.app("company.thebrowser.dia", pid: 3, name: "Dia")
+        // The Figma window was closed; Figma keeps running with no window.
+        let closed = AppWindow(identity: WindowIdentity(bundleIdentifier: figma.bundleIdentifier, processIdentifier: 1, windowID: 1), applicationName: "Figma", title: "File", frame: .zero)
+        let windows = [closed, h.window(linear, id: 2, title: "Issues"), h.window(dia, id: 3, title: "Docs")]
+        h.seed([Room(name: "Design", windows: windows, layout: .columns)])
+        XCTAssertTrue(h.fake.runningApplications().contains { $0.name == "Figma" })
+        h.fake.clearOperations()
         h.controller.showRoom(id: h.controller.rooms[0].id)
-        XCTAssertEqual(h.controller.notificationMessage, "None of the windows in “Ghost Town” are open")
+        XCTAssertEqual(h.controller.notificationMessage, "Open Figma, then open “Design” again")
         XCTAssertTrue(h.fake.operations.isEmpty, "nothing moved or hidden")
     }
 }

@@ -45,12 +45,12 @@ final class Harness {
 }
 
 final class TabCyclesLayoutsTests: XCTestCase {
-    private func seedRoom(_ h: Harness, minWidth: CGFloat = 100, frames: [CGRect]? = nil) -> UUID {
+    private func seedRoom(_ h: Harness, minWidth: CGFloat = 100) -> UUID {
         let x = h.app("x", pid: 1, name: "X")
         let a = h.window(x, id: 1, title: "A", minimumSize: CGSize(width: minWidth, height: 100))
         let b = h.window(x, id: 2, title: "B", minimumSize: CGSize(width: minWidth, height: 100))
         let c = h.window(x, id: 3, title: "C", minimumSize: CGSize(width: minWidth, height: 100))
-        h.seed([Room(name: "R", windows: [a, b, c], layout: .auto, myLayoutFrames: frames)])
+        h.seed([Room(name: "R", windows: [a, b, c], layout: .auto)])
         return h.controller.rooms[0].id
     }
 
@@ -96,14 +96,14 @@ final class TabCyclesLayoutsTests: XCTestCase {
         XCTAssertTrue(columns.allSatisfy { requested.contains($0) }, "each window is asked to take its Columns frame")
     }
 
-    func testMyLayoutIsOfferedWhenFramesExist() {
+    func testCycleHasExactlyFiveLayouts() {
         let h = Harness()
-        let frames = [CGRect(x: 8, y: 8, width: 400, height: 400), CGRect(x: 420, y: 8, width: 400, height: 400), CGRect(x: 840, y: 8, width: 400, height: 400)]
-        _ = seedRoom(h, frames: frames)
+        _ = seedRoom(h)
         let palette = h.controller.palette
         palette.open()
-        for _ in 0..<4 { palette.pressTab() }
-        XCTAssertEqual(h.controller.rooms[0].layout, .myLayout)
+        var seen: [Layout] = []
+        for _ in 0..<10 { palette.pressTab(); seen.append(h.controller.rooms[0].layout) }
+        XCTAssertEqual(seen, [.focus, .columns, .grid, .stack, .auto, .focus, .columns, .grid, .stack, .auto])
     }
 
     func testCurrentRoomWindowsMoveAtOnce() {

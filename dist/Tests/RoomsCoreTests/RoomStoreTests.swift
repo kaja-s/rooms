@@ -16,7 +16,7 @@ final class RoomStoreTests: XCTestCase {
     private func sampleRoom() -> Room {
         let window = AppWindow(identity: WindowIdentity(bundleIdentifier: "com.a", processIdentifier: 7, windowID: 9), applicationName: "A", title: "T",
                                frame: CGRect(x: 1, y: 2, width: 300, height: 200), minimumSize: CGSize(width: 100, height: 50))
-        return Room(name: "Design", windows: [window], layout: .focus, myLayoutFrames: [CGRect(x: 0, y: 0, width: 10, height: 10)], directKey: 3,
+        return Room(name: "Design", windows: [window], layout: .focus, directKey: 3,
                     createdAt: Date(timeIntervalSince1970: 1_700_000_000), lastShown: Date(timeIntervalSince1970: 1_700_000_100))
     }
 

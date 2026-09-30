@@ -25,12 +25,11 @@ description: Menu bar Mac app that saves a project's windows as a named room and
   - Frame: position and size on screen (required)
   - Minimum size: the smallest width and height the application allows for this window, measured when the room is saved (required)
 
-- :Layout: is a named arrangement of the :AppWindow: items of a room on one screen, one of Auto, Focus, Columns, Grid, My Layout, or Stack.
+- :Layout: is a named arrangement of the :AppWindow: items of a room on one screen, one of Auto, Focus, Columns, Grid, or Stack.
   - Auto: resolved to Focus, Columns, Grid, or Stack each time the room is shown
   - Focus: the main window fills the left two thirds of the screen; the other windows share the right third, stacked top to bottom
   - Columns: all windows side by side, equal widths, full height
   - Grid: windows in a grid of equal cells, rows and columns as square as the count allows, filled left to right, top to bottom
-  - My Layout: a frame per window saved from the user's own arrangement, snapped to a grid with even gaps
   - Stack: windows cascaded so each title bar peeks out below the previous one; chosen only when nothing else fits
 
 - :LayoutEngine: is the component of :RoomsApp: that computes a frame for each :AppWindow: of an ordered list from a :Layout: and the visible area of :CurrentScreen:.
@@ -42,7 +41,6 @@ description: Menu bar Mac app that saves a project's windows as a named room and
   - Name (required, unique among rooms, case-insensitive)
   - Windows: ordered list of :AppWindow: items; position 1 is the main window (required, at least one)
   - Layout: the :Layout: the room remembers (required)
-  - My Layout frames: one frame per window in window order, present only after the user saved their own arrangement (optional)
   - Direct key: a number 1 to 9, unique among rooms (optional)
   - Last shown: the time the room was last shown (optional)
 
@@ -50,7 +48,7 @@ description: Menu bar Mac app that saves a project's windows as a named room and
 
 - :RoomList: is the collection of all :Room: items, kept across launches of :RoomsApp:. Initially empty.
 
-- :CurrentRoom: is the :Room: most recently shown by :RoomsApp:, or none. It changes only when a :Room: is shown, and clears when that :Room: is deleted.
+- :CurrentRoom: is the :Room: most recently shown by :RoomsApp:, or none. It changes only when a :Room: is shown or saved with ⌘S, and clears when that :Room: is deleted.
 
 ***implementation reqs***
 
@@ -82,7 +80,7 @@ description: Menu bar Mac app that saves a project's windows as a named room and
 
 - The first-launch flag for :GettingStarted: is stored in `UserDefaults` under the key `hasLaunchedBefore`.
 
-- `RoomsCore` contains the pure logic as separate types: `Room`, `AppWindow`, `Layout`, `LayoutEngine`, `RoomStore` (JSON persistence), `RoomMatcher` (name matching and ordering), `WindowMatcher` (re-finding saved windows), and `SnapGrid` (My Layout snapping).
+- `RoomsCore` contains the pure logic as separate types: `Room`, `AppWindow`, `Layout`, `LayoutEngine`, `RoomStore` (JSON persistence), `RoomMatcher` (name matching and ordering), and `WindowMatcher` (re-finding saved windows).
 
 - `RoomsKit` defines a `WindowSystem` protocol covering every call :WindowCatalog: makes to the Accessibility API, `NSRunningApplication`, and window snapshots; `AccessibilityWindowSystem` is the real implementation, and every other type in `RoomsKit` receives a `WindowSystem` by injection.
 
@@ -95,6 +93,8 @@ description: Menu bar Mac app that saves a project's windows as a named room and
 - `RoomsKit` includes `FakeWindowSystem`, a public in-memory `WindowSystem` whose applications, windows, screens, permission flags, and recorded operations are set and read directly by test code.
 
 - `FakeWindowSystem` can give a window a resize delay in milliseconds, applied on its fake clock advanced by `wait(milliseconds:)`, and can make a window ignore resize requests.
+
+- A stored :Layout: value `myLayout` from an earlier version of :RoomsApp: loads as Auto, and stored `myLayoutFrames` are ignored.
 
 - `RoomStore` and `AppController` take the JSON file location by injection, defaulting to the Application Support path.
 
@@ -203,7 +203,6 @@ description: Menu bar Mac app that saves a project's windows as a named room and
   - A :Layout: fits when every computed frame is at least the window's minimum size; Stack always fits.
 
 - :LayoutEngine: resolves Auto to the first of Focus, Columns, Grid that fits, in that order, and to Stack when none fits.
-  - My Layout fits when every saved frame lies inside the visible area and is at least the window's minimum size; when it does not fit, or the room has no My Layout frames, Auto is resolved instead.
 
   ***acceptance tests***
   - Three windows with minimum width 400 on a 1440 by 900 visible area resolve Auto to Focus.
@@ -212,16 +211,19 @@ description: Menu bar Mac app that saves a project's windows as a named room and
 
 - Pressing ↵ on a room row in :Palette:, or clicking the row, shows the :Room:.
   - :Palette: closes.
-  - :WindowCatalog: finds each :AppWindow: of the room; a window that is not found is skipped.
-  - :LayoutEngine: computes frames on :CurrentScreen: for the found windows in room order using the room's :Layout:, resolving Auto and My Layout as defined; My Layout uses the saved frames.
-  - Each found window is unminimized, moved to its frame, and raised; the main window, or the first found window when the main one is missing, is raised last and gets keyboard focus.
-  - When no window of the room is found, nothing moves and a notification "None of the windows in “<name>” are open" is shown.
+  - :WindowCatalog: finds each :AppWindow: of the room.
+  - :LayoutEngine: computes frames on :CurrentScreen: for the found windows in room order using the room's :Layout:, resolving Auto as defined.
+  - Each found window is unminimized, moved to its frame, and raised; the main window is raised last and gets keyboard focus.
+  - When any :AppWindow: of the room is not found, because its application quit or its window was closed, nothing moves and a notification "Open <application names>, then open “<name>” again" is shown.
+  - The names are those of the applications of the windows not found, each once in room order, joined with ", " and a final " and ".
 
   ***acceptance tests***
   - Showing a Focus room with three found windows on a 1440 by 900 visible area places window 1 at the left two-thirds frame and windows 2 and 3 stacked in the right third.
     - Window 2 was minimized before and is unminimized.
     - Window 1 is raised last and has keyboard focus.
-  - Showing a room whose windows all belong to a quit application moves no window and shows the notification for that room's name.
+  - Showing the room Design, whose windows belong to Figma, Linear, and Dia, after Figma quit moves no window and shows "Open Figma, then open “Design” again".
+    - With Figma and Linear quit, the notification is "Open Figma and Linear, then open “Design” again".
+  - Showing Design after the Figma window was closed while Figma keeps running moves no window and shows "Open Figma, then open “Design” again".
 
 - Showing a :Room: hides every window that is not in the room.
   - Every running application with no found window in the room is hidden.
@@ -239,13 +241,13 @@ description: Menu bar Mac app that saves a project's windows as a named room and
 - Create Room in :WindowPicker: shows the new :Room: right after saving it.
 
 - Pressing ⇥ in :Palette: sets the selected room's :Layout: to the next one in the cycle, and ⇧⇥ to the previous one.
-  - The cycle order is Auto, Focus, Columns, Grid, My Layout, Stack; every layout is offered whether or not it fits the room's windows, and My Layout is skipped when the room has no My Layout frames.
+  - The cycle order is Auto, Focus, Columns, Grid, Stack; every layout is offered whether or not it fits the room's windows.
   - The change is written to :RoomList: at once.
   - When the selected room is :CurrentRoom:, its found windows move to the new frames at once.
   - The bottom of :Palette: shows "Here: <resolved layout name>" for the selected room and the key hint "⇥ Layout".
 
   ***acceptance tests***
-  - For a room on Auto with no My Layout frames and three windows, pressing ⇥ five times yields Focus, Columns, Grid, Stack, Auto in that order, and ⇧⇥ then yields Stack.
+  - For a room on Auto with three windows, pressing ⇥ five times yields Focus, Columns, Grid, Stack, Auto in that order, and ⇧⇥ then yields Stack.
     - After each press the room's :Layout: in a :RoomList: reloaded from disk is the one shown.
   - For a room on Auto with three windows of minimum width 1000 on a 1440 by 900 visible area, pressing ⇥ four times still yields Focus, Columns, Grid, Stack.
 
@@ -260,15 +262,19 @@ description: Menu bar Mac app that saves a project's windows as a named room and
   - Frames keep an 8-point gap from the area edges and from the middle.
   - Pressing the same ⌃⌥← or ⌃⌥→ again while the window is in that half changes it to that side's third, then two thirds, then back to the half.
 
-- Pressing ⌘S in :Palette: remembers the current arrangement of the selected room when that room is :CurrentRoom: and the arrangement matches a tidy layout.
-  - :WindowCatalog: reads the current frame of each found window of the room.
-  - When every frame is within 24 points on each edge of the frame :LayoutEngine: computes for Focus, Columns, or Grid, the room's :Layout: becomes that layout, the windows move to the exact computed frames, and :RoomList: is written.
-  - ⌘S does nothing when the selected room is not :CurrentRoom:.
-  - The bottom of :Palette: shows the key hint "⌘S Remember mine".
+- Pressing ⌘S in :Palette: saves the windows visible on :CurrentScreen: as a new :Room: named "Room <n>", with the smallest n of 1 or more that no other :Room: uses, ignoring case.
+  - The windows are those :WindowCatalog: lists on :CurrentScreen: that are not minimized and whose application is not hidden, front to back; the frontmost is place 1.
+  - :WindowCatalog: measures the minimum size of each window.
+  - The :Layout: is the first of Focus, Columns, Grid, Stack whose computed frames are within 24 points on each edge of the windows' current frames, and Auto otherwise; no window is moved.
+  - The :Room: is appended to :RoomList:, :RoomList: is written, the :Room: becomes :CurrentRoom:, and its row is selected in :Palette:, which stays open.
+  - When no window is visible on :CurrentScreen:, nothing is saved.
+  - The bottom of :Palette: shows the key hint "⌘S New room"; for 2 seconds after ⌘S it reads "Saved “Room <n>”" instead.
 
-- Pressing ⌘S in :Palette: when the arrangement of :CurrentRoom: matches no tidy layout saves it as My Layout.
-  - Each frame is snapped so its edges lie on a 16-point grid of the visible area, and windows whose edges are within 16 points of each other get exactly an 8-point gap.
-  - The snapped frames become the room's My Layout frames, its :Layout: becomes My Layout, the windows move to the snapped frames, and :RoomList: is written.
+  ***acceptance tests***
+  - With rooms "Room 1" and "room 3" in :RoomList: and three visible windows within 24 points of their Columns frames, ⌘S saves "Room 2" with :Layout: Columns and those three windows front to back.
+    - "Room 2" is :CurrentRoom:, its row is selected, the hint reads "Saved “Room 2”", and it is in a :RoomList: reloaded from disk.
+  - Two visible windows in no tidy arrangement are saved as a new :Room: on Auto, and neither window moved.
+  - A minimized window and a window of a hidden application are not part of the new :Room:.
 
 - Right-clicking a room row in :Palette: opens a context menu with Edit Windows…, Rename…, and Delete.
   - The selected row also shows "↵" and an ⓧ button at its right end, after the direct key or "Current".
@@ -292,7 +298,7 @@ description: Menu bar Mac app that saves a project's windows as a named room and
 - Edit Windows… in a row's context menu, or in the :MenuBarItem: menu for :CurrentRoom:, opens :WindowPicker: for that room, titled "Edit the windows of “<name>”", with the button Save Room in place of Create Room.
   - The cards of the room's found windows start selected, numbered in room order; a saved window that is not found is left out.
   - Clicking a selected card removes it from the selection; clicking it again appends it at the end.
-  - Save Room replaces the room's windows with the selected cards in place-number order, measures their minimum sizes again, drops the My Layout frames when the set of windows changed, writes :RoomList: to disk, and closes :WindowPicker:.
+  - Save Room replaces the room's windows with the selected cards in place-number order, measures their minimum sizes again, writes :RoomList: to disk, and closes :WindowPicker:.
   - When the room is :CurrentRoom:, it is shown again after saving.
 
 - Pressing ⌘1 to ⌘9 in :Palette: gives the selected room that direct key and writes :RoomList: to disk.
@@ -311,7 +317,7 @@ description: Menu bar Mac app that saves a project's windows as a named room and
   - It is a window centered on :CurrentScreen: with the title "Getting Started" and four numbered steps: 1 Open the windows a project needs. 2 Press ⌥Space, type a name for the room, and press ↵. 3 Click the windows that belong in it; the number on a card is its place, and 1 is the main window. Then Create Room. 4 Press ⇥ in ⌥Space to change the layout.
   - Below the steps: "From then on, ⌥Space and the room's name, or ⌃⌥1–9, brings it back." and a Done button that closes the window.
 
-- The key hints at the bottom of :Palette: form one row: "Here: <resolved layout name>", "⇥ Layout", "⌘S Remember mine", and "⌘1–9 Key" on the left, and "↵ Go" and "esc Close" on the right in a lighter color.
+- The key hints at the bottom of :Palette: form one row: "Here: <resolved layout name>", "⇥ Layout", "⌘S New room", and "⌘1–9 Key" on the left, and "↵ Go" and "esc Close" on the right in a lighter color.
   - "Here: <resolved layout name>" is omitted when no room is selected.
   - "⇥ Layout" shows the tab symbol as an arrow to a bar.
 

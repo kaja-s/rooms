@@ -171,20 +171,15 @@ public final class AppController: ObservableObject {
         picker.present(mode: .edit(roomID: id), windows: windows, preselected: found)
     }
 
-    /// Save Room: replaces the windows, measures them again, drops My Layout frames when the set changed.
+    /// Save Room: replaces the windows and measures them again.
     public func replaceWindows(ofRoom id: UUID, with selected: [AppWindow]) {
-        guard let room = room(id), !selected.isEmpty else { return }
+        guard room(id) != nil, !selected.isEmpty else { return }
         let measured = selected.map { window -> AppWindow in
             var w = window
             w.minimumSize = catalog.measureMinimumSize(of: window)
             return w
         }
-        let oldSet = Set(room.windows.map { $0.identity })
-        let newSet = Set(measured.map { $0.identity })
-        update(id) { r in
-            r.windows = measured
-            if oldSet != newSet || r.myLayoutFrames?.count != measured.count { r.myLayoutFrames = nil }
-        }
+        update(id) { $0.windows = measured }
         persist()
         if currentRoomID == id { showRoom(id: id) }
     }
@@ -205,12 +200,7 @@ public final class AppController: ObservableObject {
     }
 
     private func layoutFrames(for room: Room, found: [FoundWindow], in area: CGRect) -> (Layout, [CGRect]) {
-        let windows = found.map { $0.window }
-        var myFrames: [CGRect]?
-        if let saved = room.myLayoutFrames, saved.count == room.windows.count {
-            myFrames = found.map { saved[$0.index] }
-        }
-        return LayoutEngine.frames(for: windows, layout: room.layout, myLayoutFrames: myFrames, in: area)
+        LayoutEngine.frames(for: found.map { $0.window }, layout: room.layout, in: area)
     }
 
     /// Shows a room: lays its found windows out on the current screen, hides everything else, and makes it current.
@@ -219,8 +209,9 @@ public final class AppController: ObservableObject {
         palette.close()
         guard let open = listWindowsOrPrompt() else { return }
         let found = foundWindows(of: room, among: open)
-        guard !found.isEmpty else {
-            notify("None of the windows in “\(room.name)” are open")
+        let missing = missingApplications(of: room, found: found)
+        guard missing.isEmpty else {
+            notify("Open \(Self.joinedNames(missing)), then open “\(room.name)” again")
             return
         }
         let area = windowSystem.currentScreenVisibleArea()
@@ -279,32 +270,62 @@ public final class AppController: ObservableObject {
     }
 
     /// ⌘S: recognizes a tidy layout from the current arrangement, or saves it as My Layout. Only for the current room.
-    public func rememberArrangement(ofRoom id: UUID) {
-        guard currentRoomID == id, let room = room(id), let open = catalog.listWindows() else { return }
-        let found = foundWindows(of: room, among: open)
-        guard !found.isEmpty else { return }
-        let area = windowSystem.currentScreenVisibleArea()
-        let actual = found.map { windowSystem.frame(of: $0.window.identity) ?? $0.window.frame }
-
-        if let tidy = LayoutEngine.recognize(frames: actual, count: found.count, in: area) {
-            let frames = LayoutEngine.frames(for: tidy, count: found.count, in: area)
-            update(id) { $0.layout = tidy }
-            for (position, item) in found.enumerated() {
-                catalog.move(item.window.identity, to: frames[position])
-            }
-        } else {
-            let snapped = SnapGrid.snap(actual, in: area)
-            var full = room.windows.map { $0.frame }
-            for (position, item) in found.enumerated() { full[item.index] = snapped[position] }
-            update(id) { r in
-                r.myLayoutFrames = full
-                r.layout = .myLayout
-            }
-            for (position, item) in found.enumerated() {
-                catalog.move(item.window.identity, to: snapped[position])
-            }
+    /// Names of the applications of the room's windows that were not found (the application quit or the window was
+    /// closed), in room order, each once.
+    private func missingApplications(of room: Room, found: [FoundWindow]) -> [String] {
+        let foundIndices = Set(found.map { $0.index })
+        var names: [String] = []
+        for (index, window) in room.windows.enumerated() where !foundIndices.contains(index) && !names.contains(window.applicationName) {
+            names.append(window.applicationName)
         }
+        return names
+    }
+
+    /// "A", "A and B", "A, B and C".
+    static func joinedNames(_ names: [String]) -> String {
+        guard names.count > 1 else { return names.first ?? "" }
+        return names.dropLast().joined(separator: ", ") + " and " + names.last!
+    }
+
+    // MARK: Save visible windows (⌘S)
+
+    /// The windows visible on the current screen, front to back: not minimized and not of a hidden application.
+    private func visibleWindows(in area: CGRect) -> [AppWindow] {
+        (catalog.listWindows() ?? []).filter { window in
+            let center = CGPoint(x: window.frame.midX, y: window.frame.midY)
+            return area.contains(center)
+                && !windowSystem.isMinimized(window.identity)
+                && !windowSystem.isHidden(application: window.processIdentifier)
+        }
+    }
+
+    /// "Room <n>" with the smallest n of 1 or more that no room uses, ignoring case.
+    public func nextDefaultRoomName() -> String {
+        var n = 1
+        while RoomMatcher.hasRoom(named: "Room \(n)", in: rooms) { n += 1 }
+        return "Room \(n)"
+    }
+
+    /// ⌘S: saves the windows visible on the current screen as a new room named "Room <n>", with the layout their
+    /// arrangement matches (Focus, Columns, Grid, Stack, else Auto). No window moves. Returns the new room, or nil
+    /// when no window is visible.
+    @discardableResult
+    public func saveVisibleWindowsAsNewRoom() -> Room? {
+        let area = windowSystem.currentScreenVisibleArea()
+        let visible = visibleWindows(in: area)
+        guard !visible.isEmpty else { return nil }
+        let measured = visible.map { window -> AppWindow in
+            var w = window
+            w.minimumSize = catalog.measureMinimumSize(of: window)
+            return w
+        }
+        let current = visible.map { $0.frame }
+        let layout = LayoutEngine.recognize(frames: current, count: current.count, in: area) ?? .auto
+        let room = Room(name: nextDefaultRoomName(), windows: measured, layout: layout)
+        rooms.append(room)
+        currentRoomID = room.id
         persist()
+        return room
     }
 
     // MARK: Keys, rename, delete

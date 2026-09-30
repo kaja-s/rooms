@@ -50,9 +50,8 @@ final class LayoutEngineTests: XCTestCase {
         XCTAssertEqual(frames[1].maxY, frames[0].maxY - 32)
     }
 
-    func testAutoAndMyLayoutHaveNoFrames() {
+    func testAutoHasNoFrames() {
         XCTAssertTrue(LayoutEngine.frames(for: .auto, count: 2, in: area).isEmpty)
-        XCTAssertTrue(LayoutEngine.frames(for: .myLayout, count: 2, in: area).isEmpty)
     }
 
     func testFramesAreIntegral() {
@@ -70,33 +69,19 @@ final class LayoutEngineTests: XCTestCase {
     }
 
     func testResolveAuto() {
-        XCTAssertEqual(LayoutEngine.resolve(.auto, windows: windows(3, minWidth: 400), myLayoutFrames: nil, in: area), .focus)
-        XCTAssertEqual(LayoutEngine.resolve(.auto, windows: windows(3, minWidth: 600), myLayoutFrames: nil, in: area), .grid)
-        XCTAssertEqual(LayoutEngine.resolve(.auto, windows: windows(3, minWidth: 1000), myLayoutFrames: nil, in: area), .stack)
-        XCTAssertEqual(LayoutEngine.resolve(.auto, windows: windows(2, minWidth: 500, minHeight: 800), myLayoutFrames: nil, in: area), .columns)
+        XCTAssertEqual(LayoutEngine.resolve(.auto, windows: windows(3, minWidth: 400), in: area), .focus)
+        XCTAssertEqual(LayoutEngine.resolve(.auto, windows: windows(3, minWidth: 600), in: area), .grid)
+        XCTAssertEqual(LayoutEngine.resolve(.auto, windows: windows(3, minWidth: 1000), in: area), .stack)
+        XCTAssertEqual(LayoutEngine.resolve(.auto, windows: windows(2, minWidth: 500, minHeight: 800), in: area), .columns)
     }
 
-    func testResolveMyLayout() {
-        let saved = [CGRect(x: 10, y: 10, width: 600, height: 500), CGRect(x: 700, y: 10, width: 600, height: 500)]
-        XCTAssertEqual(LayoutEngine.resolve(.myLayout, windows: windows(2), myLayoutFrames: saved, in: area), .myLayout)
-        let outside = [CGRect(x: 10, y: 10, width: 600, height: 500), CGRect(x: 1000, y: 10, width: 600, height: 500)]
-        XCTAssertEqual(LayoutEngine.resolve(.myLayout, windows: windows(2), myLayoutFrames: outside, in: area), .focus)
-        XCTAssertEqual(LayoutEngine.resolve(.myLayout, windows: windows(2), myLayoutFrames: nil, in: area), .focus)
-        XCTAssertEqual(LayoutEngine.resolve(.myLayout, windows: windows(2, minWidth: 700), myLayoutFrames: saved, in: area), .columns)
+    func testAvailableLayoutsAreEveryLayout() {
+        XCTAssertEqual(LayoutEngine.availableLayouts, [.auto, .focus, .columns, .grid, .stack])
     }
 
-    func testFramesForRoomUsesSavedMyLayout() {
-        let saved = [CGRect(x: 10, y: 10, width: 600, height: 500)]
-        let result = LayoutEngine.frames(for: windows(1), layout: .myLayout, myLayoutFrames: saved, in: area)
-        XCTAssertEqual(result.layout, .myLayout)
-        XCTAssertEqual(result.frames, saved)
-    }
-
-    func testAvailableLayouts() {
-        XCTAssertEqual(LayoutEngine.availableLayouts(windows: windows(3, minWidth: 400), myLayoutFrames: nil, in: area), [.auto, .focus, .columns, .grid, .stack])
-        XCTAssertEqual(LayoutEngine.availableLayouts(windows: windows(3, minWidth: 1000), myLayoutFrames: nil, in: area), [.auto, .focus, .columns, .grid, .stack])
-        let tooWide = Array(repeating: CGRect(x: 0, y: 0, width: 5000, height: 5000), count: 3)
-        XCTAssertEqual(LayoutEngine.availableLayouts(windows: windows(3, minWidth: 1000), myLayoutFrames: tooWide, in: area), [.auto, .focus, .columns, .grid, .myLayout, .stack])
+    func testRecognizeStack() {
+        let stack = LayoutEngine.frames(for: .stack, count: 3, in: area)
+        XCTAssertEqual(LayoutEngine.recognize(frames: stack.map { $0.offsetBy(dx: 10, dy: -10) }, count: 3, in: area), .stack)
     }
 
     func testRecognizeWithinTolerance() {

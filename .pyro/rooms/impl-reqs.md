@@ -40,8 +40,8 @@
 - [x] The first-launch flag for :GettingStarted: is stored in `UserDefaults` under the key `hasLaunchedBefore`.
   - Verified: UserDefaults key hasLaunchedBefore
 
-- [x] `RoomsCore` contains the pure logic as separate types: `Room`, `AppWindow`, `Layout`, `LayoutEngine`, `RoomStore` (JSON persistence), `RoomMatcher` (name matching and ordering), `WindowMatcher` (re-finding saved windows), and `SnapGrid` (My Layout snapping).
-  - Verified: Room, AppWindow, Layout, LayoutEngine, RoomStore, RoomMatcher, WindowMatcher, SnapGrid
+- [x] `RoomsCore` contains the pure logic as separate types: `Room`, `AppWindow`, `Layout`, `LayoutEngine`, `RoomStore` (JSON persistence), `RoomMatcher` (name matching and ordering), and `WindowMatcher` (re-finding saved windows).
+  Verified: RoomsCore has Models.swift (Room, AppWindow, Layout), LayoutEngine, RoomStore, RoomMatcher, WindowMatcher; SnapGrid removed; Foundation/CoreGraphics only
 
 - [x] `RoomsKit` defines a `WindowSystem` protocol covering every call :WindowCatalog: makes to the Accessibility API, `NSRunningApplication`, and window snapshots; `AccessibilityWindowSystem` is the real implementation, and every other type in `RoomsKit` receives a `WindowSystem` by injection.
   - Verified: WindowSystem protocol; AccessibilityWindowSystem injected
@@ -60,6 +60,9 @@
 
 - [x] `FakeWindowSystem` can give a window a resize delay in milliseconds, applied on its fake clock advanced by `wait(milliseconds:)`, and can make a window ignore resize requests.
   Verified: FakeWindowSystem.setResizeBehavior(of:delayMilliseconds:ignoresResize:); pending frames applied when wait(milliseconds:) advances the fake clock past the delay; ignoresResize keeps the size
+
+- [x] A stored :Layout: value `myLayout` from an earlier version of :RoomsApp: loads as Auto, and stored `myLayoutFrames` are ignored.
+  Verified: Layout.init(from:) decodes "myLayout" as .auto; Room has no myLayoutFrames property so the stored key is ignored by Codable; covered by ModelsTests and conformance 12 testLegacyMyLayoutLoadsAsAuto
 
 - [x] `RoomStore` and `AppController` take the JSON file location by injection, defaulting to the Application Support path.
   - Verified: RoomStore(fileURL:), AppController(store:)

@@ -42,8 +42,19 @@ public enum Layout: String, Codable, CaseIterable {
     case focus
     case columns
     case grid
-    case myLayout
     case stack
+
+    /// `myLayout`, stored by an earlier version, loads as Auto.
+    public init(from decoder: Decoder) throws {
+        let raw = try decoder.singleValueContainer().decode(String.self)
+        if raw == "myLayout" {
+            self = .auto
+        } else if let layout = Layout(rawValue: raw) {
+            self = layout
+        } else {
+            throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown layout \(raw)"))
+        }
+    }
 
     public var displayName: String {
         switch self {
@@ -51,13 +62,12 @@ public enum Layout: String, Codable, CaseIterable {
         case .focus: return "Focus"
         case .columns: return "Columns"
         case .grid: return "Grid"
-        case .myLayout: return "My Layout"
         case .stack: return "Stack"
         }
     }
 
     /// The order used when cycling layouts with ⇥ / ⇧⇥.
-    public static let cycleOrder: [Layout] = [.auto, .focus, .columns, .grid, .myLayout, .stack]
+    public static let cycleOrder: [Layout] = [.auto, .focus, .columns, .grid, .stack]
 
     /// The tidy layouts Auto tries, in order.
     public static let tidyLayouts: [Layout] = [.focus, .columns, .grid]
@@ -70,20 +80,17 @@ public struct Room: Codable, Equatable, Identifiable {
     /// Ordered list of windows; position 1 (index 0) is the main window.
     public var windows: [AppWindow]
     public var layout: Layout
-    /// One frame per window in window order, present only after the user saved their own arrangement.
-    public var myLayoutFrames: [CGRect]?
     /// A number 1 to 9, unique among rooms.
     public var directKey: Int?
     public var createdAt: Date
     /// The time the room was last shown.
     public var lastShown: Date?
 
-    public init(id: UUID = UUID(), name: String, windows: [AppWindow], layout: Layout = .auto, myLayoutFrames: [CGRect]? = nil, directKey: Int? = nil, createdAt: Date = Date(), lastShown: Date? = nil) {
+    public init(id: UUID = UUID(), name: String, windows: [AppWindow], layout: Layout = .auto, directKey: Int? = nil, createdAt: Date = Date(), lastShown: Date? = nil) {
         self.id = id
         self.name = name
         self.windows = windows
         self.layout = layout
-        self.myLayoutFrames = myLayoutFrames
         self.directKey = directKey
         self.createdAt = createdAt
         self.lastShown = lastShown

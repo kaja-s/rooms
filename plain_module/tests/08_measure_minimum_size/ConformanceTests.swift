@@ -109,6 +109,6 @@ final class MeasureMinimumSizeTests: XCTestCase {
         }
         _ = (a, b)
         XCTAssertEqual(windows.map { $0.minimumSize.height }, [0, 0], "full-height minimums that did not shrink are 0")
-        XCTAssertNotEqual(LayoutEngine.resolve(.auto, windows: windows, myLayoutFrames: nil, in: h.area), .stack)
+        XCTAssertNotEqual(LayoutEngine.resolve(.auto, windows: windows, in: h.area), .stack)
     }
 }
