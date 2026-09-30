@@ -91,9 +91,9 @@ final class TabCyclesLayoutsTests: XCTestCase {
         palette.open()
         palette.pressTab(); palette.pressTab()
         XCTAssertEqual(h.controller.rooms[0].layout, .columns)
-        let columns = LayoutEngine.frames(for: .columns, count: 3, in: h.area)
+        let columns = LayoutEngine.adapt(.columns, windows: h.controller.rooms[0].windows, in: h.area).frames
         let requested = h.fake.operations.compactMap { op -> CGRect? in if case .setFrame(_, let f) = op { return f } else { return nil } }
-        XCTAssertTrue(columns.allSatisfy { requested.contains($0) }, "each window is asked to take its Columns frame")
+        XCTAssertTrue(columns.allSatisfy { requested.contains($0) }, "each window is asked to take its adapted Columns frame")
     }
 
     func testCycleHasExactlyFiveLayouts() {

@@ -78,6 +78,18 @@ All scenarios drive `AppController` and its view models through `FakeWindowSyste
 - S11.7 fits(): true iff every frame ≥ window's minimum size; Stack always fits.
 - S11.8 Frames are integral (whole points).
 
+## FS11a — Frames adapted to minimum sizes
+- S11a.1 When no minimum exceeds its plain frame, adapted frames equal the plain frames exactly.
+- S11a.2 Columns: a window whose minimum width exceeds the equal share gets its minimum; the others share the rest equally; 8-pt gaps kept (1440×900: mins 700,100,100 → 700, 354, 354).
+- S11a.3 Minimums together wider than the area → frames overlap by equal steps, first at left edge + 8, last ending at right edge − 8 (mins 600×3).
+- S11a.4 Grid: each column is as wide as its widest minimum and each row as tall as its tallest, sharing the rest; overlap evenly when too large.
+- S11a.5 Focus: main and side columns (2:1) respect the main window's and the widest side window's minimum widths; side windows share the height by their minimum heights; overlap evenly when too large.
+- S11a.6 Stack: each frame at least the window's minimum, moved to stay inside the area.
+- S11a.7 No frame is larger than the area; every frame stays inside the area.
+- S11a.8 A layout fits when its adapted frames do not overlap; Stack always fits.
+- AT11a.a Columns mins 700/100/100 → widths 700, 354, 354 side by side.
+- AT11a.b Columns mins 600×3 → 600 wide, equal overlap, edges 8 inside.
+
 ## FS12 — Auto resolution
 - S12.1 Auto → first of Focus, Columns, Grid that fits; else Stack.
 - S12.2 A stored `myLayout` value loads as Auto and stored `myLayoutFrames` are ignored (legacy rooms.json).
@@ -124,6 +136,22 @@ All scenarios drive `AppController` and its view models through `FakeWindowSyste
 - AT17.a Auto room, three windows: ⇥ ×5 → Focus, Columns, Grid, Stack, Auto; then ⇧⇥ → Stack; each state persisted on disk.
 - AT17.b Auto room, three windows of minimum width 1000 on 1440×900: ⇥ ×4 → Focus, Columns, Grid, Stack (nothing skipped).
 - S17.5 Choosing a layout a window cannot shrink into still moves the windows to that layout's frames; the application keeps the size it settles on.
+
+## FS17a — Notification when a layout was adapted
+- S17a.1 On show and on ⇥/⇧⇥ relayout of the current room, if any frame was adapted, a notification is published; none when nothing was adapted.
+- S17a.2 Applications: those whose window minimum exceeds its unadapted frame, each once, room order.
+- S17a.3 No overlap → "<apps> can't get smaller, so <Layout> was adjusted to fit"; overlap → "<apps> can't get small enough for <Layout> here, so some windows overlap".
+- S17a.4 Auto resolved to Stack because nothing fits → "The windows of “<name>” are too large for Focus, Columns, or Grid here, so Stack is used".
+- S17a.5 After moving, each window's frame is read back; a window that stayed wider/taller than requested gets the kept width/height as its minimum; RoomList is written; frames are adapted and applied once more; the notification is chosen after that.
+- S17a.6 Learning also happens on ⇥ relayout of the current room.
+- S17a.7 Probe: before adapting, each window whose saved minimum exceeds its unadapted frame (Focus frames for Auto) is moved to that frame; after it settles the kept width/height become its minimum — lower than the saved one when it shrank.
+- S17a.8 Frames are read after they settle: every 50 ms until the window has the requested frame, or it changed from its frame before the request and two reads match, at most 500 ms; a slow application (120 ms delay) is read at its new frame.
+- S17a.9 Windows whose saved minimum already fits are not probed.
+- AT17a.e Focus room, three windows on 1440×900, windows 2 and 3 saved min height 884 but really 300×200 → stacked in the right third without overlap, no notification, saved min heights ≤ their frames.
+- AT17a.d Grid room, four windows, A saved min 0×0 but never below 900×600 → A 900×600 top-left, others adapted without overlap; reloaded min of A 900×600; "A can't get smaller, so Grid was adjusted to fit".
+- AT17a.a Columns room R (A, B, C), A min 700 → "A can't get smaller, so Columns was adjusted to fit".
+- AT17a.b All min 600 → "A, B and C can't get small enough for Columns here, so some windows overlap".
+- AT17a.c Auto, all min 1000 → "The windows of “R” are too large for Focus, Columns, or Grid here, so Stack is used".
 
 ## FS18 — Layout preview overlay
 - S18.1 After opening the palette the preview is hidden (`isPreviewVisible == false`, `preview == nil`).

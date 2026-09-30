@@ -65,8 +65,12 @@ final class AutoResolutionTests: XCTestCase {
     }
 
     func testOrderFocusColumnsGrid() {
-        XCTAssertEqual(LayoutEngine.resolve(.auto, windows: windows(3, minWidth: 600), in: area), .grid)
-        XCTAssertEqual(LayoutEngine.resolve(.auto, windows: windows(2, minWidth: 600, minHeight: 800), in: area), .columns)
+        // Focus stacks two 500-tall side windows in 884 points and overlaps; Columns fits.
+        XCTAssertEqual(LayoutEngine.resolve(.auto, windows: windows(3, minWidth: 400, minHeight: 500), in: area), .columns)
+        // Focus and Columns overlap; a 2 by 2 Grid of 600 by 300 cells fits.
+        XCTAssertEqual(LayoutEngine.resolve(.auto, windows: windows(4, minWidth: 600, minHeight: 300), in: area), .grid)
+        // Adapting lets Focus fit where the unadapted side column would be too narrow.
+        XCTAssertEqual(LayoutEngine.resolve(.auto, windows: windows(3, minWidth: 600), in: area), .focus)
     }
 
     func testLegacyMyLayoutLoadsAsAuto() throws {

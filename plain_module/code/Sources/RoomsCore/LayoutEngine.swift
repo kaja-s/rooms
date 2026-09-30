@@ -85,17 +85,13 @@ public enum LayoutEngine {
 
     // MARK: Fit
 
-    /// A layout fits when every computed frame is at least the window's minimum size; Stack always fits.
+    /// A layout fits when its frames, adapted to the windows' minimum sizes, do not overlap; Stack always fits.
     public static func fits(_ layout: Layout, windows: [AppWindow], in area: CGRect) -> Bool {
         switch layout {
         case .stack, .auto:
             return true
         case .focus, .columns, .grid:
-            let computed = frames(for: layout, count: windows.count, in: area)
-            guard computed.count == windows.count else { return false }
-            return zip(computed, windows).allSatisfy { frame, window in
-                frame.width >= window.minimumSize.width && frame.height >= window.minimumSize.height
-            }
+            return !adapt(layout, windows: windows, in: area).overlaps
         }
     }
 
@@ -107,10 +103,10 @@ public enum LayoutEngine {
         return Layout.tidyLayouts.first { fits($0, windows: windows, in: area) } ?? .stack
     }
 
-    /// Resolves the layout and returns the frames for the given windows, one per window in order.
+    /// Resolves the layout and returns the frames for the given windows, adapted to their minimum sizes.
     public static func frames(for windows: [AppWindow], layout: Layout, in area: CGRect) -> (layout: Layout, frames: [CGRect]) {
         let resolved = resolve(layout, windows: windows, in: area)
-        return (resolved, frames(for: resolved, count: windows.count, in: area))
+        return (resolved, adapt(resolved, windows: windows, in: area).frames)
     }
 
     /// The layouts a room cycles through with ⇥, in cycle order: every layout, whether or not it fits.

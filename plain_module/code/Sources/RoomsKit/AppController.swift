@@ -206,6 +206,83 @@ public final class AppController: ObservableObject {
         LayoutEngine.frames(for: found.map { $0.window }, layout: room.layout, in: area)
     }
 
+    /// A saved minimum size can be too large (measured badly, or the application changed). Before adapting, each window
+    /// whose saved minimum is larger than its unadapted frame (Focus frames for Auto) is asked to take that frame; the
+    /// size it keeps after settling becomes its minimum, which can be smaller than the saved one.
+    private func probeMinimumSizes(of room: Room, found: [FoundWindow], in area: CGRect) -> [FoundWindow] {
+        let probeLayout: Layout = room.layout == .auto ? .focus : room.layout
+        let plain = LayoutEngine.frames(for: probeLayout, count: found.count, in: area)
+        var updated = found
+        var changed = false
+        for position in found.indices where plain.indices.contains(position) {
+            let saved = found[position].window.minimumSize
+            let slot = plain[position]
+            guard saved.width > slot.width || saved.height > slot.height else { continue }
+            let identity = found[position].window.identity
+            let before = windowSystem.frame(of: identity)
+            catalog.move(identity, to: slot)
+            guard let kept = catalog.settledFrame(of: identity, requested: slot, before: before) else { continue }
+            var minimum = saved
+            if saved.width > slot.width { minimum.width = kept.width.rounded() }
+            if saved.height > slot.height { minimum.height = kept.height.rounded() }
+            guard minimum != saved else { continue }
+            updated[position].window.minimumSize = minimum
+            let index = found[position].index
+            update(room.id) { r in if r.windows.indices.contains(index) { r.windows[index].minimumSize = minimum } }
+            changed = true
+        }
+        if changed { persist() }
+        return updated
+    }
+
+    /// A window that stayed wider or taller than its frame shows the minimum size its application really has.
+    /// Saves the kept width or height as the window's minimum size, then adapts and applies the frames once more.
+    /// Returns the found windows with the learned minimum sizes.
+    private func applyLearnedMinimumSizes(of room: Room, found: [FoundWindow], requested: [CGRect], settled: [CGRect], in area: CGRect) -> [FoundWindow] {
+        var updated = found
+        var learned = false
+        for position in found.indices where position < settled.count {
+            var minimum = updated[position].window.minimumSize
+            if settled[position].width > requested[position].width + 1 { minimum.width = settled[position].width.rounded() }
+            if settled[position].height > requested[position].height + 1 { minimum.height = settled[position].height.rounded() }
+            guard minimum != updated[position].window.minimumSize else { continue }
+            updated[position].window.minimumSize = minimum
+            let index = updated[position].index
+            update(room.id) { r in if r.windows.indices.contains(index) { r.windows[index].minimumSize = minimum } }
+            learned = true
+        }
+        guard learned else { return found }
+        persist()
+        guard let current = self.room(room.id) else { return updated }
+        let (_, frames) = layoutFrames(for: current, found: updated, in: area)
+        for (position, item) in updated.enumerated() {
+            catalog.move(item.window.identity, to: frames[position])
+        }
+        return updated
+    }
+
+    /// Tells the user when the room's layout had to be adapted to minimum sizes, or when Auto fell back to Stack.
+    private func notifyIfAdapted(_ room: Room, found: [FoundWindow], in area: CGRect) {
+        let windows = found.map { $0.window }
+        let resolved = LayoutEngine.resolve(room.layout, windows: windows, in: area)
+        let adaptation = LayoutEngine.adapt(resolved, windows: windows, in: area)
+        if room.layout == .auto, resolved == .stack, windows.count > 1 {
+            notify("The windows of “\(room.name)” are too large for Focus, Columns, or Grid here, so Stack is used")
+            return
+        }
+        guard adaptation.wasAdapted else { return }
+        var apps: [RoomsNotification.Application] = []
+        for index in adaptation.adaptedIndices where !apps.contains(where: { $0.name == windows[index].applicationName }) {
+            apps.append(RoomsNotification.Application(bundleIdentifier: windows[index].bundleIdentifier, name: windows[index].applicationName))
+        }
+        let names = Self.joinedNames(apps.map { $0.name })
+        if adaptation.overlaps && resolved != .stack {
+            notify("\(names) can't get small enough for \(resolved.displayName) here, so some windows overlap", applications: apps)
+        } else {
+            notify("\(names) can't get smaller, so \(resolved.displayName) was adjusted to fit", applications: apps)
+        }
+    }
+
     /// Shows a room: lays its found windows out on the current screen, hides everything else, and makes it current.
     public func showRoom(id: UUID) {
         guard let room = room(id) else { return }
@@ -221,19 +298,26 @@ public final class AppController: ObservableObject {
             return
         }
         let area = windowSystem.currentScreenVisibleArea()
-        let (_, frames) = layoutFrames(for: room, found: found, in: area)
 
         // Unhide applications of the room, unminimize, move, and raise each found window.
         let roomProcesses = Set(found.map { $0.window.processIdentifier })
         for pid in roomProcesses where windowSystem.isHidden(application: pid) {
             windowSystem.setHidden(false, application: pid)
         }
+        for item in found where windowSystem.isMinimized(item.window.identity) {
+            windowSystem.setMinimized(false, item.window.identity)
+        }
+        found = probeMinimumSizes(of: room, found: found, in: area)
+        let (_, probedFrames) = layoutFrames(for: room, found: found, in: area)
+        var settled: [CGRect] = []
         for (position, item) in found.enumerated() {
             let identity = item.window.identity
-            if windowSystem.isMinimized(identity) { windowSystem.setMinimized(false, identity) }
-            catalog.move(identity, to: frames[position])
+            let before = windowSystem.frame(of: identity)
+            catalog.move(identity, to: probedFrames[position])
+            settled.append(catalog.settledFrame(of: identity, requested: probedFrames[position], before: before) ?? probedFrames[position])
             windowSystem.raise(identity)
         }
+        found = applyLearnedMinimumSizes(of: room, found: found, requested: probedFrames, settled: settled, in: area)
 
         // Hide every window that is not in the room.
         let foundIdentities = Set(found.map { $0.window.identity })
@@ -254,6 +338,7 @@ public final class AppController: ObservableObject {
         currentRoomID = id
         update(id) { $0.lastShown = Date() }
         persist()
+        notifyIfAdapted(room, found: found, in: area)
     }
 
     /// Moves the found windows of the current room to the frames of its (possibly new) layout, without hiding or focusing.
@@ -261,10 +346,17 @@ public final class AppController: ObservableObject {
         guard let room = currentRoom, let open = catalog.listWindows() else { return }
         let found = foundWindows(of: room, among: open)
         guard !found.isEmpty else { return }
-        let (_, frames) = layoutFrames(for: room, found: found, in: windowSystem.currentScreenVisibleArea())
-        for (position, item) in found.enumerated() {
+        let area = windowSystem.currentScreenVisibleArea()
+        let probed = probeMinimumSizes(of: room, found: found, in: area)
+        let (_, frames) = layoutFrames(for: room, found: probed, in: area)
+        var settled: [CGRect] = []
+        for (position, item) in probed.enumerated() {
+            let before = windowSystem.frame(of: item.window.identity)
             catalog.move(item.window.identity, to: frames[position])
+            settled.append(catalog.settledFrame(of: item.window.identity, requested: frames[position], before: before) ?? frames[position])
         }
+        let learned = applyLearnedMinimumSizes(of: room, found: probed, requested: frames, settled: settled, in: area)
+        notifyIfAdapted(room, found: learned, in: area)
     }
 
     // MARK: Layout

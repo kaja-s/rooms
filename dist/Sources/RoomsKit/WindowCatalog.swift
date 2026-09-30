@@ -62,6 +62,24 @@ public final class WindowCatalog {
         }
     }
 
+    /// Reads a window's frame after it settles: every 50 ms until it has the requested frame, or it has changed from
+    /// `before` and two reads in a row match, at most 500 ms. Applications apply a move with a delay, so a window that
+    /// has not changed yet is not settled.
+    public func settledFrame(of window: WindowIdentity, requested: CGRect, before: CGRect?) -> CGRect? {
+        guard var last = system.frame(of: window) else { return nil }
+        if last.integral == requested.integral { return last }
+        var waited = 0
+        while waited < 500 {
+            system.wait(milliseconds: 50)
+            waited += 50
+            guard let next = system.frame(of: window) else { return last }
+            if next.integral == requested.integral { return next }
+            if next == last && next != before { return next }
+            last = next
+        }
+        return last
+    }
+
     /// Moves a window to a frame. When the application does not apply it, requests it once more after 100 ms
     /// and accepts the frame the application settled on.
     @discardableResult

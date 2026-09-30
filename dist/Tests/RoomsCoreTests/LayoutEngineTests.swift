@@ -70,9 +70,42 @@ final class LayoutEngineTests: XCTestCase {
 
     func testResolveAuto() {
         XCTAssertEqual(LayoutEngine.resolve(.auto, windows: windows(3, minWidth: 400), in: area), .focus)
-        XCTAssertEqual(LayoutEngine.resolve(.auto, windows: windows(3, minWidth: 600), in: area), .grid)
+        XCTAssertEqual(LayoutEngine.resolve(.auto, windows: windows(3, minWidth: 600), in: area), .focus, "Focus adapts without overlapping")
         XCTAssertEqual(LayoutEngine.resolve(.auto, windows: windows(3, minWidth: 1000), in: area), .stack)
-        XCTAssertEqual(LayoutEngine.resolve(.auto, windows: windows(2, minWidth: 500, minHeight: 800), in: area), .columns)
+        XCTAssertEqual(LayoutEngine.resolve(.auto, windows: windows(2, minWidth: 500, minHeight: 800), in: area), .focus)
+        XCTAssertEqual(LayoutEngine.resolve(.auto, windows: windows(3, minWidth: 700, minHeight: 500), in: area), .stack, "no tidy layout fits without overlap")
+    }
+
+    func testAdaptLeavesPlainFramesWhenMinimumsFit() {
+        let adaptation = LayoutEngine.adapt(.columns, windows: windows(3, minWidth: 400), in: area)
+        XCTAssertFalse(adaptation.wasAdapted)
+        XCTAssertEqual(adaptation.frames, LayoutEngine.frames(for: .columns, count: 3, in: area))
+    }
+
+    func testAdaptFocusGivesSideColumnItsMinimum() {
+        let adaptation = LayoutEngine.adapt(.focus, windows: windows(3, minWidth: 600), in: area)
+        XCTAssertTrue(adaptation.wasAdapted)
+        XCTAssertFalse(adaptation.overlaps)
+        XCTAssertEqual(adaptation.frames[1].width, 600)
+        XCTAssertEqual(adaptation.frames[0].maxX + LayoutEngine.gap, adaptation.frames[1].minX)
+        XCTAssertEqual(adaptation.frames[1].maxX, area.maxX - LayoutEngine.gap)
+    }
+
+    func testAdaptedFramesStayInsideAndNeverExceedTheArea() {
+        for layout in [Layout.focus, .columns, .grid, .stack] {
+            let adaptation = LayoutEngine.adapt(layout, windows: windows(4, minWidth: 5000, minHeight: 5000), in: area)
+            for frame in adaptation.frames {
+                XCTAssertTrue(area.insetBy(dx: LayoutEngine.gap, dy: LayoutEngine.gap).contains(frame), "\(layout) \(frame)")
+            }
+        }
+    }
+
+    func testAllocateSharesWhatIsLeft() {
+        let result = LayoutEngine.allocate(mins: [700, 100, 100], weights: [1, 1, 1], length: 1424)
+        XCTAssertEqual(result.sizes, [700, 354, 354])
+        XCTAssertEqual(result.offsets, [0, 708, 1070])
+        let overlapping = LayoutEngine.allocate(mins: [600, 600, 600], weights: [1, 1, 1], length: 1424)
+        XCTAssertEqual(overlapping.offsets, [0, 412, 824])
     }
 
     func testAvailableLayoutsAreEveryLayout() {

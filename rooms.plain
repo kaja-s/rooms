@@ -217,7 +217,16 @@ description: Menu bar Mac app that saves a project's windows as a named room and
   - Frames follow the :Layout: definition, with an 8-point gap between frames and between a frame and the area edge.
   - Focus with a single window fills the area.
   - Stack gives the first window the whole area, and each later window the previous frame moved 32 points right and 32 points down and shrunk by 32 points in width and height.
-  - A :Layout: fits when every computed frame is at least the window's minimum size; Stack always fits.
+
+- :LayoutEngine: adapts the frames of Focus, Columns, Grid, and Stack to the minimum size of each :AppWindow:.
+  - A window whose frame would be smaller than its minimum size gets its minimum size, and the other windows in the same row or column share the space that is left, keeping the 8-point gaps.
+  - When the minimum sizes together are larger than the area, the frames overlap by equal amounts and every frame stays inside the area.
+  - A frame is never larger than the area.
+  - A :Layout: fits when its adapted frames do not overlap; Stack always fits.
+
+  ***acceptance tests***
+  - Three windows with minimum widths 700, 100, and 100 on a 1440 by 900 visible area get Columns widths 700, 354, and 354, side by side with 8-point gaps.
+  - Three windows with minimum width 600 on a 1440 by 900 visible area get Columns frames 600 wide that overlap by equal amounts, the first starting at the left edge and the last ending at the right edge, each 8 points inside.
 
 - :LayoutEngine: resolves Auto to the first of Focus, Columns, Grid that fits, in that order, and to Stack when none fits.
 
@@ -272,6 +281,27 @@ description: Menu bar Mac app that saves a project's windows as a named room and
   - For a room on Auto with three windows, pressing ⇥ five times yields Focus, Columns, Grid, Stack, Auto in that order, and ⇧⇥ then yields Stack.
     - After each press the room's :Layout: in a :RoomList: reloaded from disk is the one shown.
   - For a room on Auto with three windows of minimum width 1000 on a 1440 by 900 visible area, pressing ⇥ four times still yields Focus, Columns, Grid, Stack.
+
+- When :RoomsApp: moves the windows of a :Room: to the frames of a :Layout: that :LayoutEngine: had to adapt, a :Notification: says so.
+  - It applies when a :Room: is shown and when ⇥ or ⇧⇥ moves the windows of :CurrentRoom:.
+  - Before adapting, each window whose saved minimum size is larger than its unadapted frame is asked to take the unadapted frame, of Focus when the :Layout: is Auto; the size it keeps becomes its minimum size, which can be smaller than the saved one.
+  - After moving the windows, a window that stayed wider or taller than its frame gets the width or height it kept as its minimum size, and the frames are adapted and applied once more before the :Notification: is chosen.
+  - :WindowCatalog: reads a window's frame after it settles: every 50 ms until it has the requested frame, or it has changed and two reads in a row match, at most 500 ms.
+  - A changed minimum size is written to :RoomList:.
+  - The applications are those of the windows whose minimum size is larger than their unadapted frame, each once in room order.
+  - When the adapted frames do not overlap, the message is "<application names> can't get smaller, so <layout name> was adjusted to fit".
+  - When they overlap, the message is "<application names> can't get small enough for <layout name> here, so some windows overlap".
+  - When Auto resolves to Stack because none of Focus, Columns, Grid fits, the message is "The windows of “<name>” are too large for Focus, Columns, or Grid here, so Stack is used".
+  - Nothing is shown when no frame was adapted.
+
+  ***acceptance tests***
+  - Showing a Columns room R whose windows belong to applications A, B, and C, where the window of A has minimum width 700, on a 1440 by 900 visible area shows "A can't get smaller, so Columns was adjusted to fit".
+  - With every window of R at minimum width 600, the notification is "A, B and C can't get small enough for Columns here, so some windows overlap".
+  - Showing R on Auto with every window at minimum width 1000 shows "The windows of “R” are too large for Focus, Columns, or Grid here, so Stack is used".
+  - Showing a Grid room of four windows on a 1440 by 900 visible area, where the window of A has a saved minimum size of 0 by 0 but never gets smaller than 900 by 600, ends with A at 900 by 600 in the top-left cell and the other three windows adapted around it without overlap.
+    - The saved minimum size of A in a :RoomList: reloaded from disk is 900 by 600, and the notification is "A can't get smaller, so Grid was adjusted to fit".
+  - Showing a Focus room of three windows on a 1440 by 900 visible area, where windows 2 and 3 have a saved minimum height of 884 but can get as small as 300 by 200, stacks windows 2 and 3 in the right third without overlap and shows no notification.
+    - Their saved minimum heights in a :RoomList: reloaded from disk are no larger than their frames.
 
 - While :Palette: is open, pressing ⇥ or ⇧⇥ shows the layout preview: a click-through overlay covering the visible area of :CurrentScreen:, above every window except :Palette:, drawn per :LayoutPreviewDesign:.
   - The overlay has one card per saved window of the selected :Room:, at the frame :LayoutEngine: computes for the room's :Layout: on :CurrentScreen:, showing the application icon, the application name, and the window title.
