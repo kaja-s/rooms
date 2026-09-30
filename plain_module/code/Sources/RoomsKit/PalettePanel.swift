@@ -18,14 +18,17 @@ final class PalettePanel: NSPanel {
 
 final class PalettePanelController {
     private let panel: PalettePanel
+    private let hosting: NSHostingView<PaletteView>
     private unowned let controller: AppController
+    private let overlay: LayoutPreviewOverlayController
     private var cancellables: Set<AnyCancellable> = []
     private var mouseMonitor: Any?
-    static let width: CGFloat = 640
+    /// Top edge of the panel while it is open; the panel grows and shrinks downwards from it.
+    private var topEdge: CGFloat = 0
 
     init(controller: AppController) {
         self.controller = controller
-        panel = PalettePanel(contentRect: NSRect(x: 0, y: 0, width: PalettePanelController.width, height: 420),
+        panel = PalettePanel(contentRect: NSRect(x: 0, y: 0, width: PaletteDesign.panelWidth, height: 300),
                              styleMask: [.borderless, .nonactivatingPanel, .fullSizeContentView],
                              backing: .buffered, defer: false)
         panel.level = .floating
@@ -36,9 +39,10 @@ final class PalettePanelController {
         panel.hasShadow = true
         panel.isMovableByWindowBackground = false
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .transient]
-        let hosting = NSHostingView(rootView: PaletteView(palette: controller.palette, controller: controller))
-        hosting.sizingOptions = [.preferredContentSize]
+        hosting = NSHostingView(rootView: PaletteView(palette: controller.palette, controller: controller))
+        hosting.sizingOptions = []
         panel.contentView = hosting
+        overlay = LayoutPreviewOverlayController(palette: controller.palette)
         panel.keyHandler = { [weak self] event in self?.handle(event) ?? false }
 
         controller.palette.$isVisible
@@ -46,25 +50,66 @@ final class PalettePanelController {
             .receive(on: RunLoop.main)
             .sink { [weak self] visible in visible ? self?.show() : self?.hide() }
             .store(in: &cancellables)
+
+        // Rows appear and disappear while typing; keep the panel sized to its content.
+        controller.palette.objectWillChange
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in self?.resizeToContent() }
+            .store(in: &cancellables)
+
+        controller.palette.$isPreviewVisible
+            .removeDuplicates()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] visible in self?.updateOverlay(visible: visible) }
+            .store(in: &cancellables)
+    }
+
+    private func contentHeight() -> CGFloat {
+        hosting.layoutSubtreeIfNeeded()
+        return max(hosting.fittingSize.height, 120).rounded()
     }
 
     private func show() {
         let area = controller.palette.screenArea
-        panel.layoutIfNeeded()
-        let size = panel.contentView?.fittingSize ?? panel.frame.size
-        let width = PalettePanelController.width
-        let height = max(size.height, 160)
-        let origin = NSPoint(x: area.midX - width / 2, y: area.minY + area.height * 0.58 - height / 2)
+        let height = contentHeight()
+        let width = PaletteDesign.panelWidth
+        topEdge = (area.minY + area.height * 0.62 + height / 2).rounded()
+        let origin = NSPoint(x: (area.midX - width / 2).rounded(), y: topEdge - height)
         panel.setFrame(NSRect(origin: origin, size: NSSize(width: width, height: height)), display: true)
         panel.makeKeyAndOrderFront(nil)
+        panel.invalidateShadow()
         mouseMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
             self?.controller.palette.clickedOutside()
+        }
+    }
+
+    private func resizeToContent() {
+        guard controller.palette.isVisible else { return }
+        // objectWillChange fires before the change lands; measure on the next turn of the run loop.
+        DispatchQueue.main.async { [weak self] in
+            guard let self, self.controller.palette.isVisible else { return }
+            let height = self.contentHeight()
+            guard abs(height - self.panel.frame.height) >= 1 else { return }
+            var frame = self.panel.frame
+            frame.origin.y = self.topEdge - height
+            frame.size.height = height
+            self.panel.setFrame(frame, display: true)
+            self.panel.invalidateShadow()
+        }
+    }
+
+    private func updateOverlay(visible: Bool) {
+        if visible && controller.palette.isVisible {
+            overlay.show(below: panel)
+        } else {
+            overlay.hide()
         }
     }
 
     private func hide() {
         if let mouseMonitor { NSEvent.removeMonitor(mouseMonitor) }
         mouseMonitor = nil
+        overlay.hide()
         panel.orderOut(nil)
     }
 
@@ -91,6 +136,33 @@ final class PalettePanelController {
     }
 }
 
+// MARK: - Design colors
+
+extension Color {
+    /// sRGB color from "#RRGGBB".
+    init(hex: String, opacity: Double = 1) {
+        let digits = hex.trimmingCharacters(in: CharacterSet(charactersIn: "#"))
+        let value = UInt32(digits, radix: 16) ?? 0
+        self.init(.sRGB,
+                  red: Double((value >> 16) & 0xFF) / 255,
+                  green: Double((value >> 8) & 0xFF) / 255,
+                  blue: Double(value & 0xFF) / 255,
+                  opacity: opacity)
+    }
+}
+
+enum PaletteColors {
+    static let panelFill = Color(hex: PaletteDesign.panelFillHex, opacity: PaletteDesign.panelFillOpacity)
+    static let panelBorder = Color.black.opacity(PaletteDesign.panelBorderOpacity)
+    static let textPrimary = Color(hex: PaletteDesign.textPrimaryHex)
+    static let textSecondary = Color(hex: PaletteDesign.textSecondaryHex)
+    static let textTertiary = Color(hex: PaletteDesign.textTertiaryHex)
+    static let divider = Color(hex: PaletteDesign.dividerHex)
+    static let selection = Color(hex: PaletteDesign.selectionHex)
+    static let onSelection = Color(hex: PaletteDesign.onSelectionHex)
+    static let onSelectionMuted = Color(hex: PaletteDesign.onSelectionHex, opacity: PaletteDesign.onSelectionMutedOpacity)
+}
+
 // MARK: - SwiftUI
 
 struct PaletteView: View {
@@ -100,37 +172,61 @@ struct PaletteView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack(spacing: 10) {
-                Image(systemName: "door.left.hand.open").font(.system(size: 20)).foregroundStyle(.secondary)
-                TextField("Go to a room", text: $palette.query)
-                    .textFieldStyle(.plain)
-                    .font(.system(size: 24, weight: .regular))
-                    .focused($fieldFocused)
+            ForEach(Array(PaletteDesign.sections.enumerated()), id: \.offset) { _, section in
+                switch section {
+                case .searchField: searchField
+                case .divider: divider
+                case .list: list
+                case .keyHints: footer
+                }
             }
-            .padding(.horizontal, 18).padding(.vertical, 14)
-            Divider().padding(.horizontal, 14)
-            list
-            if let preview = palette.preview {
-                LayoutPreviewView(preview: preview).padding(.horizontal, 18).padding(.vertical, 8)
-            }
-            footer
         }
-        .frame(width: PalettePanelController.width)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(.quaternary))
+        .frame(width: PaletteDesign.panelWidth)
+        .background(PaletteColors.panelFill, in: RoundedRectangle(cornerRadius: PaletteDesign.panelCornerRadius, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: PaletteDesign.panelCornerRadius, style: .continuous).strokeBorder(PaletteColors.panelBorder, lineWidth: 1))
+        .clipShape(RoundedRectangle(cornerRadius: PaletteDesign.panelCornerRadius, style: .continuous))
+        .environment(\.colorScheme, .light)
         .onAppear { fieldFocused = true }
         .onReceive(palette.$isVisible) { visible in if visible { DispatchQueue.main.async { fieldFocused = true } } }
     }
 
+    private var searchField: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "door.left.hand.open")
+                .font(.system(size: 22, weight: .regular))
+                .foregroundStyle(PaletteColors.textSecondary)
+            TextField("", text: $palette.query, prompt: Text("Go to a room"))
+                .textFieldStyle(.plain)
+                .font(.system(size: 28, weight: .regular))
+                .foregroundStyle(PaletteColors.textPrimary)
+                .tint(PaletteColors.selection)
+                .focused($fieldFocused)
+        }
+        .padding(.horizontal, PaletteDesign.horizontalInset)
+        .frame(height: PaletteDesign.searchRowHeight)
+    }
+
+    private var divider: some View {
+        Rectangle()
+            .fill(PaletteColors.divider)
+            .frame(height: 1)
+            .padding(.horizontal, PaletteDesign.horizontalInset)
+    }
+
     private var list: some View {
         let rows = palette.rows
-        return VStack(spacing: 2) {
+        return VStack(spacing: PaletteDesign.rowSpacing) {
             if let empty = palette.emptyStateText {
-                Text(empty).foregroundStyle(.secondary).padding(.vertical, 24)
+                Text(empty)
+                    .font(.system(size: 15))
+                    .foregroundStyle(PaletteColors.textSecondary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 24)
             } else {
                 ForEach(Array(rows.enumerated()), id: \.offset) { index, row in
-                    PaletteRowView(row: row, isSelected: index == palette.selectedIndex,
-                                   showsReturnAndDelete: palette.rowShowsReturnAndDelete(at: index),
+                    PaletteRowView(row: row,
+                                   isSelected: index == palette.selectedIndex,
+                                   trailingElements: palette.rowTrailingElements(at: index),
                                    onTap: { palette.clickRow(index) },
                                    onDelete: { palette.clickDeleteButton(index) })
                         .contextMenu {
@@ -141,7 +237,9 @@ struct PaletteView: View {
                 }
             }
         }
-        .padding(.horizontal, 12).padding(.vertical, 8)
+        .padding(.horizontal, PaletteDesign.listInset)
+        .padding(.top, 8 + PaletteDesign.listInset - 4)
+        .padding(.bottom, 4)
     }
 
     private var footer: some View {
@@ -149,92 +247,124 @@ struct PaletteView: View {
             ForEach(palette.leadingFooterHints, id: \.self) { hint in
                 FooterHintView(hint: hint)
             }
-            .foregroundStyle(.secondary)
-            Spacer()
+            .foregroundStyle(PaletteColors.textSecondary)
+            Spacer(minLength: 16)
             ForEach(palette.trailingFooterHints, id: \.self) { hint in
                 FooterHintView(hint: hint)
             }
-            .foregroundStyle(.tertiary)
+            .foregroundStyle(PaletteColors.textTertiary)
         }
-        .font(.system(size: 13))
-        .padding(.horizontal, 18).padding(.bottom, 12).padding(.top, 4)
+        .font(.system(size: 14))
+        .lineLimit(1)
+        .padding(.horizontal, PaletteDesign.horizontalInset)
+        .frame(height: PaletteDesign.footerHeight)
     }
 }
 
 struct PaletteRowView: View {
     let row: PaletteRow
     let isSelected: Bool
-    let showsReturnAndDelete: Bool
+    /// Trailer, then "↵" and "ⓧ" for the selected room row.
+    let trailingElements: [String]
     let onTap: () -> Void
     let onDelete: () -> Void
 
+    private var nameColor: Color { isSelected ? PaletteColors.onSelection : PaletteColors.textPrimary }
+    private var secondaryColor: Color { isSelected ? PaletteColors.onSelectionMuted : PaletteColors.textSecondary }
+
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 0) {
             switch row {
             case .room(let room):
-                HStack(spacing: -6) {
-                    ForEach(Array(room.icons.prefix(4).enumerated()), id: \.offset) { _, icon in
-                        if let icon {
-                            Image(nsImage: icon).resizable().frame(width: 22, height: 22)
-                        } else {
-                            RoundedRectangle(cornerRadius: 5).fill(.quaternary).frame(width: 22, height: 22)
-                        }
-                    }
-                }
-                .frame(width: 96, alignment: .leading)
+                IconClusterView(icons: room.icons)
+                    .frame(width: PaletteDesign.iconSlotWidth, alignment: .leading)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(room.name).font(.system(size: 15, weight: .medium))
-                    Text(room.subtitle).font(.system(size: 12)).foregroundStyle(isSelected ? .primary : .secondary)
+                    Text(room.name)
+                        .font(.system(size: 17, weight: .medium))
+                        .foregroundStyle(nameColor)
+                    Text(room.subtitle)
+                        .font(.system(size: 14))
+                        .foregroundStyle(secondaryColor)
                 }
-                Spacer()
-                if let trailer = room.trailer {
-                    Text(trailer).font(.system(size: 12)).foregroundStyle(isSelected ? .primary : .secondary)
-                }
-                if showsReturnAndDelete {
-                    Text("↵").font(.system(size: 12)).foregroundStyle(.secondary)
-                    Button(action: onDelete) {
-                        Image(systemName: "xmark.circle.fill")
-                    }
-                    .buttonStyle(.plain)
-                    .help("Delete room")
-                }
+                .lineLimit(1)
+                Spacer(minLength: 12)
+                trailing
             case .create(let name):
-                Image(systemName: "plus.circle").frame(width: 96, alignment: .leading).foregroundStyle(.secondary)
-                Text("Create “\(name)”").font(.system(size: 15, weight: .medium))
-                Spacer()
+                Image(systemName: "plus.circle")
+                    .font(.system(size: 22))
+                    .foregroundStyle(isSelected ? PaletteColors.onSelectionMuted : PaletteColors.textSecondary)
+                    .frame(width: PaletteDesign.iconSlotWidth, alignment: .leading)
+                Text("Create “\(name)”")
+                    .font(.system(size: 17, weight: .medium))
+                    .foregroundStyle(nameColor)
+                    .lineLimit(1)
+                Spacer(minLength: 12)
+                if isSelected {
+                    Text(PaletteDesign.returnGlyph)
+                        .font(.system(size: 14))
+                        .foregroundStyle(PaletteColors.onSelection)
+                }
             }
         }
-        .padding(.horizontal, 14).padding(.vertical, 8)
-        .background(isSelected ? Color.accentColor : Color.clear, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .foregroundStyle(isSelected ? Color.white : Color.primary)
+        .padding(.horizontal, PaletteDesign.rowHorizontalPadding)
+        .frame(height: PaletteDesign.rowHeight)
+        .background {
+            if isSelected {
+                RoundedRectangle(cornerRadius: PaletteDesign.rowCornerRadius, style: .continuous)
+                    .fill(PaletteColors.selection)
+            }
+        }
         .contentShape(Rectangle())
         .onTapGesture(perform: onTap)
     }
-}
 
-struct LayoutPreviewView: View {
-    let preview: LayoutPreview
-    private let height: CGFloat = 96
-
-    var body: some View {
-        let area = preview.area
-        let scale = area.width > 0 ? height / area.height : 0
-        let width = area.width * scale
-        ZStack(alignment: .topLeading) {
-            RoundedRectangle(cornerRadius: 6).fill(.quaternary).frame(width: width, height: height)
-            ForEach(Array(preview.frames.enumerated()), id: \.offset) { index, frame in
-                RoundedRectangle(cornerRadius: 3)
-                    .fill(Color.accentColor.opacity(0.8))
-                    .overlay(Text("\(index + 1)").font(.system(size: 10, weight: .semibold)).foregroundStyle(.white))
-                    .frame(width: max(2, frame.width * scale), height: max(2, frame.height * scale))
-                    .offset(x: (frame.minX - area.minX) * scale, y: (area.maxY - frame.maxY) * scale)
+    private var trailing: some View {
+        HStack(spacing: 14) {
+            ForEach(Array(trailingElements.enumerated()), id: \.offset) { _, element in
+                switch element {
+                case PaletteDesign.returnGlyph:
+                    Text(element)
+                        .font(.system(size: 14))
+                        .foregroundStyle(PaletteColors.onSelection)
+                case PaletteDesign.deleteGlyph:
+                    Button(action: onDelete) {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 20))
+                            .symbolRenderingMode(.palette)
+                            .foregroundStyle(PaletteColors.selection, PaletteColors.onSelection)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Delete room")
+                default:
+                    Text(element)
+                        .font(.system(size: 14))
+                        .foregroundStyle(secondaryColor)
+                }
             }
         }
-        .frame(width: width, height: height, alignment: .topLeading)
-        .animation(.easeInOut(duration: LayoutPreview.animationDuration), value: preview.frames)
     }
 }
 
+/// Up to four application icons, each overlapping the previous one.
+struct IconClusterView: View {
+    let icons: [NSImage?]
+
+    var body: some View {
+        HStack(spacing: -PaletteDesign.iconOverlap) {
+            ForEach(Array(icons.prefix(PaletteDesign.maxIcons).enumerated()), id: \.offset) { _, icon in
+                Group {
+                    if let icon {
+                        Image(nsImage: icon).resizable().interpolation(.high)
+                    } else {
+                        RoundedRectangle(cornerRadius: PaletteDesign.iconCornerRadius).fill(PaletteColors.divider)
+                    }
+                }
+                .frame(width: PaletteDesign.iconSize, height: PaletteDesign.iconSize)
+                .clipShape(RoundedRectangle(cornerRadius: PaletteDesign.iconCornerRadius, style: .continuous))
+            }
+        }
+    }
+}
 
 /// One key hint of the footer; "⇥ Layout" shows the tab symbol as an arrow to a bar.
 struct FooterHintView: View {

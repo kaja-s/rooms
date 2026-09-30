@@ -12,6 +12,9 @@ description: Menu bar Mac app that saves a project's windows as a named room and
 
 - :Palette: is a floating panel of :RoomsApp: opened with the global hotkey ⌥Space, with a text field for typing and a list of results below it.
 
+- :PaletteDesign: is the visual design of :Palette:.
+  - It is described in [resources/palette-design.md](resources/palette-design.md).
+
 - :WindowPicker: is a view of :RoomsApp: that shows all open windows as cards, one card per window, for choosing which windows belong together.
 
 - :GettingStarted: is a view of :RoomsApp: that shows the setup steps, opened from :MenuBarItem:.
@@ -31,6 +34,9 @@ description: Menu bar Mac app that saves a project's windows as a named room and
   - Stack: windows cascaded so each title bar peeks out below the previous one; chosen only when nothing else fits
 
 - :LayoutEngine: is the component of :RoomsApp: that computes a frame for each :AppWindow: of an ordered list from a :Layout: and the visible area of :CurrentScreen:.
+
+- :LayoutPreviewDesign: is the visual design of the layout preview overlay.
+  - It is described in [resources/layout-preview-design.md](resources/layout-preview-design.md).
 
 - :Room: is a named set of :AppWindow: items with the :Layout: they are shown in.
   - Name (required, unique among rooms, case-insensitive)
@@ -59,6 +65,10 @@ description: Menu bar Mac app that saves a project's windows as a named room and
 - :Implementation: has no Xcode project, no `.app` bundle, no App Sandbox, and no code signing; `swift build` and `swift run Rooms` are the only build and launch commands.
 
 - :RoomsApp: uses AppKit: `NSApplication` with the `.accessory` activation policy, `NSStatusItem` for :MenuBarItem:, a non-activating `NSPanel` for :Palette:, and `NSWindow` for :WindowPicker: and :GettingStarted:; view content is SwiftUI hosted in `NSHostingView`.
+
+- `PaletteViewModel.panelHeight` is the height of :Palette: computed from the :PaletteDesign: tokens and the current rows; the :Palette: panel sets its frame height to exactly this value on open and whenever it changes, and never measures `NSHostingView.fittingSize` or applies a minimum height.
+
+- The :Palette: panel is borderless, non-opaque, with a clear background; its SwiftUI content fills the panel exactly and draws the rounded shape, fill, and border itself, and the panel shadow is invalidated after every resize so it follows the rounded shape.
 
 - :WindowCatalog: uses the Accessibility API (`AXUIElement`) to list, move, resize, raise, minimize, and focus windows, `NSRunningApplication` to hide and activate applications, and `CGWindowListCopyWindowInfo` for window ids and z-order.
 
@@ -230,10 +240,12 @@ description: Menu bar Mac app that saves a project's windows as a named room and
   - For a room on Auto with no My Layout frames whose three windows fit every layout, pressing ⇥ five times yields Focus, Columns, Grid, Stack, Auto in that order, and ⇧⇥ then yields Stack.
     - After each press the room's :Layout: in a :RoomList: reloaded from disk is the one shown.
 
-- :Palette: shows a layout preview for the selected room between the list and the key hints.
-  - The preview is a miniature of the visible area of :CurrentScreen: with one rectangle per window at the frame :LayoutEngine: computes for the room's :Layout:, each rectangle labeled with the window's place number.
-  - When the selected layout changes, the rectangles move to their new positions over 200 ms.
-  - The preview is hidden when the Create row is selected.
+- While :Palette: is open, pressing ⇥ or ⇧⇥ shows the layout preview: a click-through overlay covering the visible area of :CurrentScreen:, above every window except :Palette:, drawn per :LayoutPreviewDesign:.
+  - The overlay has one card per saved window of the selected :Room:, at the frame :LayoutEngine: computes for the room's :Layout: on :CurrentScreen:, showing the application icon, the application name, and the window title.
+  - When the layout changes, the cards move to their new frames over 200 ms.
+  - ↑ and ↓ switch the cards to the newly selected room.
+  - The overlay stays visible when the selected room is :CurrentRoom: and its windows moved.
+  - The overlay hides when the Create row is selected and when :Palette: closes.
 
 - Pressing ⌃⌥← or ⌃⌥→ moves the focused window to the left or right half of the visible area of :CurrentScreen:, ⌃⌥↑ or ⌃⌥↓ to the top or bottom half, and ⌃⌥↩ to the whole area.
   - Frames keep an 8-point gap from the area edges and from the middle.
@@ -295,3 +307,15 @@ description: Menu bar Mac app that saves a project's windows as a named room and
   - "⇥ Layout" shows the tab symbol as an arrow to a bar.
 
 - :Palette:, :WindowPicker:, :GettingStarted:, and the dialogs of :RoomsApp: use the light appearance regardless of the system appearance.
+
+- :Palette: is drawn per :PaletteDesign:.
+  - :Palette: is 640 points wide with a 22-point corner radius, and each row is 64 points high.
+  - The selected row has a solid fill in the selection color of :PaletteDesign: and white text; its right end shows the row's trailer, then "↵", then the ⓧ button.
+  - Nothing is drawn between the list and the key hints.
+  - The height of :Palette: is the sum of the search row, divider, list, and key hints heights of :PaletteDesign:; nothing is cut off, and all four corners show the 22-point radius.
+
+  ***acceptance tests***
+  - With one :Room: in :RoomList: and an empty text field, `PaletteViewModel.panelHeight` is 213.
+  - With three :Room: items and an empty text field, `PaletteViewModel.panelHeight` is 349, and with nine it is 757.
+  - With one :Room: named "alpha", typing "zz" leaves only the Create row, and `PaletteViewModel.panelHeight` is 213; typing "a" then shows "alpha" and the Create row, and it is 281.
+  - With an empty :RoomList: and an empty text field, `PaletteViewModel.panelHeight` is 213.

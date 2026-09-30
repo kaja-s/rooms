@@ -106,10 +106,14 @@ All scenarios drive `AppController` and its view models through `FakeWindowSyste
 - S17.4 Footer shows "Here: <resolved layout>" (Auto shows the resolved concrete layout) and hint "⇥ Layout".
 - AT17.a Auto room, all layouts fit, no My Layout frames: ⇥ ×5 → Focus, Columns, Grid, Stack, Auto; then ⇧⇥ → Stack; each state persisted on disk.
 
-## FS18 — Layout preview
-- S18.1 `PaletteViewModel.preview` for the selected room: area size = visible area; one rectangle per window at engine frames, labeled 1..n.
-- S18.2 Preview changes when layout changes (animation duration constant 200 ms exposed).
-- S18.3 Preview nil when the Create row is selected.
+## FS18 — Layout preview overlay
+- S18.1 After opening the palette the preview is hidden (`isPreviewVisible == false`, `preview == nil`).
+- S18.2 ⇥ (and ⇧⇥) with a room selected makes the preview visible: area = visible area of the current screen; one card per saved window of the selected room, in window order, keyed by window identity, at the frame LayoutEngine computes for the room's (new) layout; each card carries the application name, the window title, and an application icon; no place numbers.
+- S18.3 Cycling again moves the cards to the frames of the next layout (animation duration constant 200 ms).
+- S18.4 ↓ / ↑ switch the cards to the newly selected room (same visibility, new windows and frames).
+- S18.5 Selecting the Create row hides the preview; closing the palette hides it; reopening starts hidden.
+- S18.6 When the selected room is the current room, ⇥ moves its real windows and the preview stays visible with the new frames.
+- S18.7 A room whose windows are saved but not open still gets cards (saved windows, no window-system lookups).
 
 ## FS19 — ⌃⌥ snapping keys
 - S19.1 ⌃⌥← → left half (gap 8 from edges and middle); ⌃⌥→ right half; ⌃⌥↑ top half; ⌃⌥↓ bottom half; ⌃⌥↩ whole area.
@@ -170,3 +174,8 @@ All scenarios drive `AppController` and its view models through `FakeWindowSyste
 
 ## FS30 — Light appearance
 - S30.1 `RoomsApp.appearanceName` is `.aqua` and `RoomsApp.appearance` resolves to a non-nil light appearance; it is applied to `NSApp.appearance` at launch so the palette, picker, Getting Started, and dialogs are light regardless of the system appearance.
+
+## FS31 — Palette drawn per PaletteDesign
+- S31.1 `PaletteDesign.panelWidth == 640`, `PaletteDesign.panelCornerRadius == 22`, `PaletteDesign.rowHeight == 64`, `PaletteDesign.selectionHex == "#3B76F6"`, `PaletteDesign.onSelectionHex == "#FFFFFF"`.
+- S31.2 Selected row's trailing elements are [trailer, "↵", "ⓧ"] ("⌃⌥1" or "Current" first, omitted when none); unselected rows show only their trailer.
+- S31.3 `PaletteDesign.sections == [.searchField, .divider, .list, .keyHints]`: nothing between the list and the key hints, even while the layout preview is visible.

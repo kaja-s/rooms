@@ -44,46 +44,107 @@ final class Harness {
     }
 }
 
-final class LayoutPreviewTests: XCTestCase {
-    func testPreviewMatchesEngineFrames() {
-        let h = Harness()
-        let x = h.app("x", pid: 1, name: "X")
-        let a = h.window(x, id: 1, title: "A", minimumSize: CGSize(width: 100, height: 100))
-        let b = h.window(x, id: 2, title: "B", minimumSize: CGSize(width: 100, height: 100))
-        h.seed([Room(name: "R", windows: [a, b], layout: .grid)])
-        let palette = h.controller.palette
-        palette.open()
-        let preview = palette.preview
-        XCTAssertEqual(preview?.area, h.area)
-        XCTAssertEqual(preview?.layout, .grid)
-        XCTAssertEqual(preview?.frames, LayoutEngine.frames(for: .grid, count: 2, in: h.area))
-        XCTAssertEqual(preview?.frames.count, 2, "one rectangle per window, labeled by place number")
+final class LayoutPreviewOverlayTests: XCTestCase {
+    private func seed(_ h: Harness) -> [Room] {
+        let x = h.app("x", pid: 1, name: "Xcode")
+        let y = h.app("y", pid: 2, name: "Safari")
+        let a = h.window(x, id: 1, title: "Main.swift", minimumSize: CGSize(width: 100, height: 100))
+        let b = h.window(y, id: 2, title: "Docs", minimumSize: CGSize(width: 100, height: 100))
+        let c = h.window(x, id: 3, title: "", minimumSize: CGSize(width: 100, height: 100))
+        h.seed([Room(name: "Design", windows: [a, b], layout: .auto, createdAt: Date(timeIntervalSince1970: 1)),
+                Room(name: "Build", windows: [c, a, b], layout: .grid, createdAt: Date(timeIntervalSince1970: 2))])
+        return h.controller.rooms
     }
 
-    func testPreviewChangesWithLayoutAndAnimates() {
+    func testHiddenUntilTabThenShowsOneCardPerSavedWindow() {
         let h = Harness()
-        let x = h.app("x", pid: 1, name: "X")
-        let a = h.window(x, id: 1, title: "A", minimumSize: CGSize(width: 100, height: 100))
-        let b = h.window(x, id: 2, title: "B", minimumSize: CGSize(width: 100, height: 100))
-        h.seed([Room(name: "R", windows: [a, b], layout: .auto)])
+        let rooms = seed(h)
         let palette = h.controller.palette
         palette.open()
-        XCTAssertEqual(palette.preview?.layout, .focus, "Auto shows the resolved layout")
-        palette.pressTab(); palette.pressTab()
+        XCTAssertFalse(palette.isPreviewVisible)
+        XCTAssertNil(palette.preview)
+        palette.pressTab() // Auto -> Focus
+        XCTAssertTrue(palette.isPreviewVisible)
+        let preview = palette.preview!
+        XCTAssertEqual(preview.area, h.area, "covers the visible area of the current screen")
+        XCTAssertEqual(preview.layout, .focus)
+        XCTAssertEqual(preview.cards.map { $0.id }, rooms[0].windows.map { $0.identity })
+        XCTAssertEqual(preview.cards.map { $0.applicationName }, ["Xcode", "Safari"])
+        XCTAssertEqual(preview.cards.map { $0.title }, ["Main.swift", "Docs"])
+        XCTAssertTrue(preview.cards.allSatisfy { $0.icon != nil })
+        XCTAssertEqual(preview.frames, LayoutEngine.frames(for: .focus, count: 2, in: h.area))
+    }
+
+    func testCardsMoveWhenCyclingAndGlideOver200ms() {
+        let h = Harness()
+        _ = seed(h)
+        let palette = h.controller.palette
+        palette.open()
+        palette.pressTab()
+        let focus = palette.preview!.frames
+        palette.pressTab() // Columns
         XCTAssertEqual(palette.preview?.layout, .columns)
+        XCTAssertEqual(palette.preview?.frames, LayoutEngine.frames(for: .columns, count: 2, in: h.area))
+        XCTAssertNotEqual(palette.preview?.frames, focus)
+        palette.pressTab(shift: true)
+        XCTAssertEqual(palette.preview?.frames, focus)
         XCTAssertEqual(LayoutPreview.animationDuration, 0.2)
     }
 
-    func testPreviewHiddenForCreateRow() {
+    func testArrowKeysSwitchCardsToTheSelectedRoom() {
         let h = Harness()
-        let x = h.app("x", pid: 1, name: "X")
-        let a = h.window(x, id: 1, title: "A")
-        h.seed([Room(name: "R", windows: [a])])
+        let rooms = seed(h)
         let palette = h.controller.palette
         palette.open()
-        XCTAssertNotNil(palette.preview)
+        palette.pressTab()
+        palette.moveSelection(by: 1)
+        XCTAssertTrue(palette.isPreviewVisible)
+        XCTAssertEqual(palette.preview?.cards.map { $0.id }, rooms[1].windows.map { $0.identity })
+        XCTAssertEqual(palette.preview?.layout, .grid)
+        XCTAssertEqual(palette.preview?.cards.map { $0.title }, ["", "Main.swift", "Docs"])
+        palette.moveSelection(by: -1)
+        XCTAssertEqual(palette.preview?.cards.count, 2)
+    }
+
+    func testHiddenForCreateRowAndWhenPaletteCloses() {
+        let h = Harness()
+        _ = seed(h)
+        let palette = h.controller.palette
+        palette.open()
+        palette.pressTab()
         palette.query = "Something new"
         XCTAssertTrue(palette.isCreateRowSelected)
         XCTAssertNil(palette.preview)
+        palette.pressEscape()
+        XCTAssertFalse(palette.isPreviewVisible)
+        XCTAssertNil(palette.preview)
+        palette.open()
+        XCTAssertFalse(palette.isPreviewVisible)
+    }
+
+    func testStaysVisibleWhileCurrentRoomWindowsMove() {
+        let h = Harness()
+        let rooms = seed(h)
+        h.controller.showRoom(id: rooms[0].id)
+        let palette = h.controller.palette
+        palette.open()
+        palette.pressTab()
+        palette.pressTab()
+        XCTAssertTrue(palette.isPreviewVisible)
+        let frames = LayoutEngine.frames(for: h.controller.room(rooms[0].id)!.layout, count: 2, in: h.area)
+        XCTAssertEqual(palette.preview?.frames, frames)
+        XCTAssertEqual(h.fake.frame(of: rooms[0].windows[0].identity), frames[0], "real windows moved too")
+    }
+
+    func testClosedApplicationStillGetsCards() {
+        let h = Harness()
+        let rooms = seed(h)
+        h.fake.quitApplication(processIdentifier: 2)
+        h.fake.clearOperations()
+        let palette = h.controller.palette
+        palette.open()
+        palette.pressTab()
+        XCTAssertEqual(palette.preview?.cards.map { $0.id }, rooms[0].windows.map { $0.identity })
+        XCTAssertTrue(h.fake.operations.isEmpty, "no window-system calls")
     }
 }

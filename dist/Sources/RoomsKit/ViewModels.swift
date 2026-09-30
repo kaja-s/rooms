@@ -42,14 +42,84 @@ public enum PaletteRow: Equatable {
     }
 }
 
-/// Miniature of the visible area with one rectangle per window at its computed frame.
+/// One ghost window card of the layout preview overlay.
+public struct LayoutPreviewCard: Identifiable, Equatable {
+    public var id: WindowIdentity
+    public var applicationName: String
+    public var title: String
+    /// Frame in AppKit screen coordinates, as computed by the layout engine.
+    public var frame: CGRect
+    public var icon: NSImage?
+
+    public static func == (lhs: LayoutPreviewCard, rhs: LayoutPreviewCard) -> Bool {
+        lhs.id == rhs.id && lhs.applicationName == rhs.applicationName && lhs.title == rhs.title && lhs.frame == rhs.frame
+    }
+}
+
+/// Full-screen overlay of ghost window cards shown while cycling layouts.
 public struct LayoutPreview: Equatable {
+    /// Visible area of the current screen the overlay covers.
     public var area: CGRect
-    /// Frames in window (place-number) order; the label of rectangle i is i + 1.
-    public var frames: [CGRect]
     public var layout: Layout
-    /// Rectangles glide to new positions over this duration when the layout changes.
+    /// One card per saved window of the selected room, in window order.
+    public var cards: [LayoutPreviewCard]
+    public var frames: [CGRect] { cards.map { $0.frame } }
+    /// Cards glide to their new frames over this duration when the layout changes.
     public static let animationDuration: TimeInterval = 0.2
+}
+
+/// Top-to-bottom sections of the palette.
+public enum PaletteSection: Equatable {
+    case searchField, divider, list, keyHints
+}
+
+/// Checkable values of the palette design (resources/palette-design.md).
+public enum PaletteDesign {
+    public static let panelWidth: CGFloat = 640
+    public static let panelCornerRadius: CGFloat = 22
+    public static let rowHeight: CGFloat = 64
+    public static let rowCornerRadius: CGFloat = 12
+    public static let rowSpacing: CGFloat = 4
+    public static let rowHorizontalPadding: CGFloat = 14
+    public static let horizontalInset: CGFloat = 24
+    public static let listInset: CGFloat = 12
+    public static let searchRowHeight: CGFloat = 72
+    public static let footerHeight: CGFloat = 44
+    public static let iconSlotWidth: CGFloat = 100
+    public static let iconSize: CGFloat = 22
+    public static let iconCornerRadius: CGFloat = 6
+    public static let iconOverlap: CGFloat = 6
+    public static let maxIcons = 4
+
+    public static let panelFillHex = "#FAFAFC"
+    public static let panelFillOpacity = 0.98
+    public static let panelBorderOpacity = 0.08
+    public static let textPrimaryHex = "#1C1C1E"
+    public static let textSecondaryHex = "#6E6E73"
+    public static let textTertiaryHex = "#AEAEB2"
+    public static let dividerHex = "#E5E5EA"
+    public static let selectionHex = "#3B76F6"
+    public static let onSelectionHex = "#FFFFFF"
+    public static let onSelectionMutedOpacity = 0.85
+
+    /// Nothing is drawn between the list and the key hints.
+    public static let sections: [PaletteSection] = [.searchField, .divider, .list, .keyHints]
+
+    public static let returnGlyph = "↵"
+    public static let deleteGlyph = "ⓧ"
+}
+
+/// Checkable values of the layout preview design (resources/layout-preview-design.md).
+public enum LayoutPreviewDesign {
+    public static let cardFillHex = "#F2F2F4"
+    public static let cardFillOpacity = 0.96
+    public static let cardBorderHex = "#4A8AF4"
+    public static let cardBorderWidth: CGFloat = 1.5
+    public static let cardCornerRadius: CGFloat = 10
+    public static let titleBarHeight: CGFloat = 28
+    public static let dotSize: CGFloat = 6
+    public static let dotColorHex = "#C7C7CC"
+    public static let appIconSize: CGFloat = 64
 }
 
 public struct ContextMenuItem: Equatable {
@@ -80,6 +150,8 @@ public final class PaletteViewModel: ObservableObject {
     @Published public var selectedIndex = 0
     /// Visible area of the screen the palette opened on.
     @Published public private(set) var screenArea: CGRect = .zero
+    /// Set by ⇥ / ⇧⇥; cleared when the palette opens or closes.
+    @Published public private(set) var isPreviewVisible = false
 
     init(controller: AppController) {
         self.controller = controller
@@ -152,6 +224,18 @@ public final class PaletteViewModel: ObservableObject {
         return true
     }
 
+    /// What the right end of a row shows, left to right: its trailer, then "↵" and "ⓧ" when it is the selected room row.
+    public func rowTrailingElements(at index: Int) -> [String] {
+        let all = rows
+        guard all.indices.contains(index), case .room(let row) = all[index] else { return [] }
+        var elements: [String] = []
+        if let trailer = row.trailer { elements.append(trailer) }
+        if rowShowsReturnAndDelete(at: index) {
+            elements += [PaletteDesign.returnGlyph, PaletteDesign.deleteGlyph]
+        }
+        return elements
+    }
+
     // MARK: Footer
 
     /// "Here: <resolved layout name>" for the selected room.
@@ -179,11 +263,19 @@ public final class PaletteViewModel: ObservableObject {
         leadingFooterHints + trailingFooterHints
     }
 
-    /// Layout preview for the selected room; nil when the Create row is selected or nothing is selected.
+    /// The layout preview overlay: shown after ⇥ / ⇧⇥ for the selected room; nil while hidden,
+    /// when the Create row is selected, or when nothing is selected. Cards use the room's saved windows.
     public var preview: LayoutPreview? {
-        guard let room = selectedRoom else { return nil }
+        guard isVisible, isPreviewVisible, let room = selectedRoom else { return nil }
         let (layout, frames) = LayoutEngine.frames(for: room.windows, layout: room.layout, myLayoutFrames: room.myLayoutFrames, in: screenArea)
-        return LayoutPreview(area: screenArea, frames: frames, layout: layout)
+        let cards = zip(room.windows, frames).map { window, frame in
+            LayoutPreviewCard(id: window.identity,
+                              applicationName: window.applicationName,
+                              title: window.title,
+                              frame: frame,
+                              icon: controller.windowSystem.icon(forBundleIdentifier: window.bundleIdentifier))
+        }
+        return LayoutPreview(area: screenArea, layout: layout, cards: cards)
     }
 
     // MARK: Visibility
@@ -192,10 +284,12 @@ public final class PaletteViewModel: ObservableObject {
         screenArea = controller.windowSystem.currentScreenVisibleArea()
         query = ""
         selectedIndex = 0
+        isPreviewVisible = false
         isVisible = true
     }
 
     public func close() {
+        isPreviewVisible = false
         isVisible = false
     }
 
@@ -245,6 +339,7 @@ public final class PaletteViewModel: ObservableObject {
             next = available[(position + 1) % available.count]
         }
         controller.setLayout(next, ofRoom: room.id)
+        isPreviewVisible = true
         objectWillChange.send()
     }
 

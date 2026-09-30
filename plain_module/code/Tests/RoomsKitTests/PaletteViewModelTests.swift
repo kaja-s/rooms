@@ -190,17 +190,56 @@ final class PaletteViewModelTests: XCTestCase {
         XCTAssertEqual(h.controller.rooms.map { $0.name }, ["Design"])
     }
 
-    func testPreviewGeometry() {
+    func testPreviewOverlayAppearsAfterTabAndFollowsSelection() {
         let h = TestHarness()
-        let x = h.app("x", pid: 1, name: "X")
-        let a = h.window(x, id: 1, title: "A", minimumSize: CGSize(width: 100, height: 100))
-        h.seed([Room(name: "R", windows: [a], layout: .focus)])
+        let x = h.app("x", pid: 1, name: "Xcode")
+        let a = h.window(x, id: 1, title: "Main.swift", minimumSize: CGSize(width: 100, height: 100))
+        let b = h.window(x, id: 2, title: "Tests", minimumSize: CGSize(width: 100, height: 100))
+        h.seed([Room(name: "One", windows: [a], layout: .focus, createdAt: Date(timeIntervalSince1970: 1)),
+                Room(name: "Two", windows: [a, b], layout: .columns, createdAt: Date(timeIntervalSince1970: 2))])
         let palette = h.controller.palette
         palette.open()
+        XCTAssertFalse(palette.isPreviewVisible)
+        XCTAssertNil(palette.preview)
+        palette.pressTab()
+        XCTAssertTrue(palette.isPreviewVisible)
         let preview = palette.preview!
         XCTAssertEqual(preview.area, h.fake.visibleArea)
-        XCTAssertEqual(preview.frames, [CGRect(x: 8, y: 8, width: 1424, height: 884)])
+        XCTAssertEqual(preview.layout, .columns)
+        XCTAssertEqual(preview.cards.map { $0.id }, [a.identity])
+        XCTAssertEqual(preview.cards[0].applicationName, "Xcode")
+        XCTAssertEqual(preview.cards[0].title, "Main.swift")
+        XCTAssertNotNil(preview.cards[0].icon)
+        palette.moveSelection(by: 1)
+        XCTAssertEqual(palette.preview?.cards.map { $0.title }, ["Main.swift", "Tests"])
+        XCTAssertEqual(palette.preview?.frames, LayoutEngine.frames(for: .columns, count: 2, in: h.fake.visibleArea))
+        palette.query = "new room"
+        XCTAssertNil(palette.preview, "hidden while the Create row is selected")
+        palette.close()
+        XCTAssertFalse(palette.isPreviewVisible)
+        palette.open()
+        XCTAssertNil(palette.preview)
         XCTAssertEqual(LayoutPreview.animationDuration, 0.2)
+    }
+
+    func testRowTrailingElementsAndSections() {
+        let h = TestHarness()
+        let x = h.app("x", pid: 1, name: "X")
+        let a = h.window(x, id: 1, title: "A")
+        h.seed([Room(name: "One", windows: [a], directKey: 1, createdAt: Date(timeIntervalSince1970: 1)),
+                Room(name: "Two", windows: [a], directKey: 2, createdAt: Date(timeIntervalSince1970: 2)),
+                Room(name: "Three", windows: [a], createdAt: Date(timeIntervalSince1970: 3))])
+        let palette = h.controller.palette
+        palette.open()
+        XCTAssertEqual(palette.rowTrailingElements(at: 0), ["⌃⌥1", "↵", "ⓧ"])
+        XCTAssertEqual(palette.rowTrailingElements(at: 1), ["⌃⌥2"])
+        XCTAssertEqual(palette.rowTrailingElements(at: 2), [])
+        palette.moveSelection(by: 2)
+        XCTAssertEqual(palette.rowTrailingElements(at: 2), ["↵", "ⓧ"])
+        XCTAssertEqual(palette.rowTrailingElements(at: 9), [])
+        XCTAssertEqual(PaletteDesign.sections, [.searchField, .divider, .list, .keyHints])
+        XCTAssertEqual(PaletteDesign.panelWidth, 640)
+        XCTAssertEqual(PaletteDesign.rowHeight, 64)
     }
 }
 
