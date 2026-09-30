@@ -1,0 +1,5 @@
+unittests-script: test_scripts/run_unittests_swift.sh
+conformance-tests-script: test_scripts/run_conformance_tests_swift.sh
+prepare-environment-script: test_scripts/prepare_environment_swift.sh
+test-script-timeout: 900
+build-dest: dist

@@ -1,0 +1,297 @@
+---
+description: Menu bar Mac app that saves a project's windows as a named room and brings them back, laid out, from a ⌥Space palette.
+---
+
+***definitions***
+
+- :RoomsApp: is a macOS menu bar application with no Dock icon.
+
+- :CurrentScreen: is the screen the mouse pointer is on; its visible area is the screen minus the menu bar and the Dock.
+
+- :MenuBarItem: is the status item of :RoomsApp: in the macOS menu bar, with a drop-down menu.
+
+- :Palette: is a floating panel of :RoomsApp: opened with the global hotkey ⌥Space, with a text field for typing and a list of results below it.
+
+- :WindowPicker: is a view of :RoomsApp: that shows all open windows as cards, one card per window, for choosing which windows belong together.
+
+- :GettingStarted: is a view of :RoomsApp: that shows the setup steps, opened from :MenuBarItem:.
+
+- :AppWindow: is a window of a running application on the Mac, identified by its application and its window identity so it can be found again while the application runs.
+  - Application name and icon (required)
+  - Window title (required, may be empty)
+  - Frame: position and size on screen (required)
+  - Minimum size: the smallest width and height the application allows for this window, measured when the room is saved (required)
+
+- :Layout: is a named arrangement of the :AppWindow: items of a room on one screen, one of Auto, Focus, Columns, Grid, My Layout, or Stack.
+  - Auto: resolved to Focus, Columns, Grid, or Stack each time the room is shown
+  - Focus: the main window fills the left two thirds of the screen; the other windows share the right third, stacked top to bottom
+  - Columns: all windows side by side, equal widths, full height
+  - Grid: windows in a grid of equal cells, rows and columns as square as the count allows, filled left to right, top to bottom
+  - My Layout: a frame per window saved from the user's own arrangement, snapped to a grid with even gaps
+  - Stack: windows cascaded so each title bar peeks out below the previous one; chosen only when nothing else fits
+
+- :LayoutEngine: is the component of :RoomsApp: that computes a frame for each :AppWindow: of an ordered list from a :Layout: and the visible area of :CurrentScreen:.
+
+- :Room: is a named set of :AppWindow: items with the :Layout: they are shown in.
+  - Name (required, unique among rooms, case-insensitive)
+  - Windows: ordered list of :AppWindow: items; position 1 is the main window (required, at least one)
+  - Layout: the :Layout: the room remembers (required)
+  - My Layout frames: one frame per window in window order, present only after the user saved their own arrangement (optional)
+  - Direct key: a number 1 to 9, unique among rooms (optional)
+  - Last shown: the time the room was last shown (optional)
+
+- :WindowCatalog: is the component of :RoomsApp: that lists the open :AppWindow: items of all running applications, and finds a saved :AppWindow: again among them.
+
+- :RoomList: is the collection of all :Room: items, kept across launches of :RoomsApp:. Initially empty.
+
+- :CurrentRoom: is the :Room: most recently shown by :RoomsApp:, or none. It changes only when a :Room: is shown, and clears when that :Room: is deleted.
+
+***implementation reqs***
+
+- :RoomList: is written to disk atomically: to a temporary file in the same folder that then replaces the previous file.
+
+- When an application does not apply a requested window frame, :RoomsApp: requests it once more after 100 ms and then accepts the frame the application settled on.
+
+- :Implementation: is written in Swift, Swift 5 language mode, built with Swift Package Manager (swift-tools-version 5.10), for macOS 14 or newer on Apple silicon and Intel.
+
+- :Implementation: is one Swift package with a `Package.swift` at the build folder root and three products: the library target `RoomsCore` (Foundation only, no AppKit), the library target `RoomsKit` (depends on `RoomsCore`, links AppKit, SwiftUI, ApplicationServices, Carbon), and the executable target `Rooms` whose `main.swift` only starts the app from `RoomsKit`.
+
+- :Implementation: has no Xcode project, no `.app` bundle, no App Sandbox, and no code signing; `swift build` and `swift run Rooms` are the only build and launch commands.
+
+- :RoomsApp: uses AppKit: `NSApplication` with the `.accessory` activation policy, `NSStatusItem` for :MenuBarItem:, a non-activating `NSPanel` for :Palette:, and `NSWindow` for :WindowPicker: and :GettingStarted:; view content is SwiftUI hosted in `NSHostingView`.
+
+- :WindowCatalog: uses the Accessibility API (`AXUIElement`) to list, move, resize, raise, minimize, and focus windows, `NSRunningApplication` to hide and activate applications, and `CGWindowListCopyWindowInfo` for window ids and z-order.
+
+- :AppWindow: identity is the application bundle identifier, the process identifier, and the `CGWindowID`; :WindowCatalog: pairs an Accessibility window element with its `CGWindowID` through the private function `_AXUIElementGetWindow`.
+
+- :WindowPicker: snapshots are taken with `CGWindowListCreateImage` for the window's `CGWindowID`.
+
+- Global hotkeys (⌥Space, ⌃⌥1–9, ⌃⌥ arrows, ⌃⌥↩) are registered with the Carbon `RegisterEventHotKey` API; keys inside :Palette: and :WindowPicker: are handled by the panel or window itself.
+
+- :RoomList: is stored as one JSON file at `~/Library/Application Support/Rooms/rooms.json`, encoded with `Codable`, dates in ISO 8601, and loaded at launch; a missing or unreadable file is treated as an empty :RoomList: and the unreadable file is kept as `rooms.json.corrupt`.
+
+- The first-launch flag for :GettingStarted: is stored in `UserDefaults` under the key `hasLaunchedBefore`.
+
+- `RoomsCore` contains the pure logic as separate types: `Room`, `AppWindow`, `Layout`, `LayoutEngine`, `RoomStore` (JSON persistence), `RoomMatcher` (name matching and ordering), `WindowMatcher` (re-finding saved windows), and `SnapGrid` (My Layout snapping).
+
+- `RoomsKit` defines a `WindowSystem` protocol covering every call :WindowCatalog: makes to the Accessibility API, `NSRunningApplication`, and window snapshots; `AccessibilityWindowSystem` is the real implementation, and every other type in `RoomsKit` receives a `WindowSystem` by injection.
+
+- `RoomsKit` exposes an `AppController` facade that owns the `RoomStore`, :CurrentRoom:, the `WindowSystem`, and one view model per surface (`PaletteViewModel`, `WindowPickerViewModel`, `StatusMenuModel`, `GettingStartedModel`); every user action in :Palette:, :WindowPicker:, and the :MenuBarItem: menu is a method on one of these view models, and views only bind to them.
+
+- Every Accessibility call that fails for one window is logged with `os.Logger` (subsystem `dev.rooms.app`) and that window is skipped; a failure never stops the rest of the operation or crashes :RoomsApp:.
+
+- All layout arithmetic uses AppKit screen coordinates in points and integral frames, rounded to whole points.
+
+- `RoomsKit` includes `FakeWindowSystem`, a public in-memory `WindowSystem` whose applications, windows, screens, permission flags, and recorded operations are set and read directly by test code.
+
+- `RoomStore` and `AppController` take the JSON file location by injection, defaulting to the Application Support path.
+
+- `Package.swift` declares the test targets `RoomsCoreTests` (depends on `RoomsCore`), `RoomsKitTests` (depends on `RoomsKit`), and `ConformanceTests` at `Tests/ConformanceTests` (depends on `RoomsCore` and `RoomsKit`), the last holding only an empty `Placeholder.swift` with no test cases.
+
+- :UnitTests: use XCTest and live in `Tests/RoomsCoreTests` and `Tests/RoomsKitTests`, one test file per type under test.
+
+- :UnitTests: of `RoomsKit` drive view models and `AppController` with `FakeWindowSystem` and a `RoomStore` in a temporary directory; they never call the Accessibility API, open a window, register a hotkey, or touch the user's Application Support folder.
+
+- :UnitTests: are executed via the run script [test_scripts/run_unittests_swift.sh](test_scripts/run_unittests_swift.sh).
+
+***test reqs***
+
+- :ConformanceTests: are XCTest test cases in Swift, one or more `.swift` files per functional spec, compiled into the package's `ConformanceTests` target.
+
+- :ConformanceTests: `@testable import RoomsCore` and `@testable import RoomsKit`, and drive the app only through `AppController` and its view models with a `FakeWindowSystem`; they never call the Accessibility API, open a window, register a hotkey, or need a macOS permission.
+
+- :ConformanceTests: give `AppController` a `RoomStore` in a fresh temporary directory per test.
+
+- :ConformanceTests: must be implemented and executed; no test is skipped.
+
+- :ConformanceTests: are prepared via the prepare script [test_scripts/prepare_environment_swift.sh](test_scripts/prepare_environment_swift.sh).
+
+- :ConformanceTests: are executed via the run script [test_scripts/run_conformance_tests_swift.sh](test_scripts/run_conformance_tests_swift.sh).
+
+***functional specs***
+
+- :RoomsApp: runs as a menu bar application and shows :MenuBarItem:.
+  - The menu has, in order: a disabled header with the name of :CurrentRoom: or "No room", Show Palette (⌥Space), Edit Windows…, Rename…, Getting Started, Quit Rooms.
+  - Edit Windows… and Rename… are disabled when there is no :CurrentRoom:.
+  - Quit Rooms quits :RoomsApp:.
+
+- Pressing ⌥Space anywhere toggles :Palette:.
+  - :Palette: opens on :CurrentScreen:, above all other windows, with its text field focused and empty.
+  - :Palette: also opens from Show Palette in the :MenuBarItem: menu.
+  - Esc, ⌥Space, or a click outside :Palette: closes it.
+  - The bottom of :Palette: shows the key hints "↵ Go" and "esc Close".
+
+- :Palette: lists every :Room: in :RoomList: below the text field, most recently shown first, then rooms never shown in creation order.
+  - A row shows the application icons of the room's windows, the name, and "<layout name> · <count> windows".
+  - The right end of a row shows "Current" when the room is :CurrentRoom:, otherwise its direct key as "⌃⌥<n>" when set.
+  - The first row is selected when :Palette: opens; ↑ and ↓ move the selection.
+  - When :RoomList: is empty and the text field is empty, the list area shows "No rooms yet. Type a name and press ↵ to create one."
+
+- Typing in the :Palette: text field filters the room list to the :Room: items whose name matches the typed text, and selects the first match.
+  - A name matches when every typed character appears in the name in the typed order, not necessarily adjacent, ignoring case.
+  - Matches are ordered: names starting with the typed text first, then names where the typed text starts a word, then the rest; ties keep the unfiltered order.
+  - When the typed text is not empty and is not exactly an existing name, ignoring case, a last row "Create “<typed text>”" follows the matches; it is selected when there are no matches.
+
+  ***acceptance tests***
+  - Typing `de` over the rooms Design, Deep Work, and Daily Build lists Design then Deep Work, then the row "Create “de”".
+    - Neither Design nor Deep Work was shown before, and Design was created first.
+    - Daily Build is not listed.
+    - Design is selected.
+
+- :WindowCatalog: lists the open :AppWindow: items of every running application.
+  - Only standard windows are listed; menus, tooltips, utility panels, and the windows of :RoomsApp: itself are not.
+  - Minimized windows and windows of hidden applications are listed.
+  - When :RoomsApp: lacks the macOS Accessibility permission, listing is not possible and :RoomsApp: shows a dialog "Rooms needs Accessibility access to see and move windows" with the buttons Open System Settings and Cancel; Open System Settings opens the Accessibility pane of System Settings.
+
+- Pressing ↵ on the Create row of :Palette: closes :Palette: and opens :WindowPicker: for a new :Room: with the typed name, centered on :CurrentScreen:.
+  - The title reads "Choose the windows for “<name>”".
+  - There is one card per :AppWindow: from :WindowCatalog:, in the order listed, showing a snapshot image of the window, the application icon in a corner, and the window title below it, or the application name when the title is empty.
+  - Without the macOS Screen Recording permission, the card shows the application icon in place of the snapshot.
+  - The buttons Cancel and Create Room sit below the cards; Cancel closes :WindowPicker: without saving.
+
+- Clicking a card in :WindowPicker: toggles its selection.
+  - A selected card shows a highlighted border and a badge with its place number: 1 for the first selected card, then in selection order.
+  - Deselecting a card removes its badge and renumbers the remaining selected cards to close the gap.
+  - Create Room is enabled only while at least one card is selected.
+
+- :WindowCatalog: measures the minimum size of an :AppWindow:.
+  - It asks the window to resize to 1 by 1 point, reads the size the application actually allows, and restores the original frame.
+  - The window is not moved, and its content is not changed.
+
+- Create Room in :WindowPicker: saves a :Room:.
+  - The windows are the selected cards in place-number order; the :Layout: is Auto; the direct key is unset.
+  - :WindowCatalog: measures the minimum size of each selected :AppWindow: before saving.
+  - The :Room: is appended to :RoomList: and :RoomList: is written to disk, so it is present after :RoomsApp: relaunches.
+  - :WindowPicker: closes.
+
+  ***acceptance tests***
+  - Selecting cards B, A, then C and pressing Create Room saves the room with windows in the order B, A, C.
+    - The saved :Room: has :Layout: Auto and no direct key.
+    - Each saved :AppWindow: carries the minimum size :WindowCatalog: measured.
+    - A :RoomList: loaded again from the same file contains that :Room: with the same window order.
+
+- :WindowCatalog: finds a saved :AppWindow: again among the open windows.
+  - It matches the window identity first; failing that, a window of the same application with the same title; failing that, the first window of the same application not matched by another saved :AppWindow: of the same room.
+  - An :AppWindow: whose application is not running is not found.
+
+  ***acceptance tests***
+  - A saved window whose application was relaunched with new identities is found by its title.
+    - Two saved windows of the same application whose titles both changed are matched to that application's remaining windows in saved order, each window at most once.
+
+- :LayoutEngine: computes a frame for each :AppWindow: of an ordered list for one of Focus, Columns, Grid, or Stack within the visible area of :CurrentScreen:.
+  - Frames follow the :Layout: definition, with an 8-point gap between frames and between a frame and the area edge.
+  - Focus with a single window fills the area.
+  - Stack gives the first window the whole area, and each later window the previous frame moved 32 points right and 32 points down and shrunk by 32 points in width and height.
+  - A :Layout: fits when every computed frame is at least the window's minimum size; Stack always fits.
+
+- :LayoutEngine: resolves Auto to the first of Focus, Columns, Grid that fits, in that order, and to Stack when none fits.
+  - My Layout fits when every saved frame lies inside the visible area and is at least the window's minimum size; when it does not fit, or the room has no My Layout frames, Auto is resolved instead.
+
+  ***acceptance tests***
+  - Three windows with minimum width 400 on a 1440 by 900 visible area resolve Auto to Focus.
+  - Three windows with minimum width 1000 on a 1440 by 900 visible area resolve Auto to Stack.
+    - Focus, Columns, and Grid each leave at least one frame narrower than 1000.
+
+- Pressing ↵ on a room row in :Palette:, or clicking the row, shows the :Room:.
+  - :Palette: closes.
+  - :WindowCatalog: finds each :AppWindow: of the room; a window that is not found is skipped.
+  - :LayoutEngine: computes frames on :CurrentScreen: for the found windows in room order using the room's :Layout:, resolving Auto and My Layout as defined; My Layout uses the saved frames.
+  - Each found window is unminimized, moved to its frame, and raised; the main window, or the first found window when the main one is missing, is raised last and gets keyboard focus.
+  - When no window of the room is found, nothing moves and a notification "None of the windows in “<name>” are open" is shown.
+
+  ***acceptance tests***
+  - Showing a Focus room with three found windows on a 1440 by 900 visible area places window 1 at the left two-thirds frame and windows 2 and 3 stacked in the right third.
+    - Window 2 was minimized before and is unminimized.
+    - Window 1 is raised last and has keyboard focus.
+  - Showing a room whose windows all belong to a quit application moves no window and shows the notification for that room's name.
+
+- Showing a :Room: hides every window that is not in the room.
+  - Every running application with no found window in the room is hidden.
+  - Every other window of an application that has a found window in the room is minimized.
+  - No window is closed.
+
+  ***acceptance tests***
+  - Showing room A (windows 1 and 2 of application X) while application Y and a third window of X are open hides application Y and minimizes window 3.
+    - Showing room B (window 3 of X and window 4 of Y) afterwards unhides Y, unminimizes windows 3 and 4, and minimizes windows 1 and 2.
+    - After both operations the open window count is unchanged.
+
+- Showing a :Room: makes it :CurrentRoom:, sets its Last shown to now, and writes :RoomList: to disk.
+  - The header of the :MenuBarItem: menu shows the new :CurrentRoom: name.
+
+- Create Room in :WindowPicker: shows the new :Room: right after saving it.
+
+- Pressing ⇥ in :Palette: sets the selected room's :Layout: to the next one that fits, and ⇧⇥ to the previous one.
+  - The cycle order is Auto, Focus, Columns, Grid, My Layout, Stack; a layout that does not fit the room's windows on :CurrentScreen: is skipped, and My Layout is skipped when the room has no My Layout frames.
+  - The change is written to :RoomList: at once.
+  - When the selected room is :CurrentRoom:, its found windows move to the new frames at once.
+  - The bottom of :Palette: shows "Here: <resolved layout name>" for the selected room and the key hint "⇥ Layout".
+
+  ***acceptance tests***
+  - For a room on Auto with no My Layout frames whose three windows fit every layout, pressing ⇥ five times yields Focus, Columns, Grid, Stack, Auto in that order, and ⇧⇥ then yields Stack.
+    - After each press the room's :Layout: in a :RoomList: reloaded from disk is the one shown.
+
+- :Palette: shows a layout preview for the selected room between the list and the key hints.
+  - The preview is a miniature of the visible area of :CurrentScreen: with one rectangle per window at the frame :LayoutEngine: computes for the room's :Layout:, each rectangle labeled with the window's place number.
+  - When the selected layout changes, the rectangles move to their new positions over 200 ms.
+  - The preview is hidden when the Create row is selected.
+
+- Pressing ⌃⌥← or ⌃⌥→ moves the focused window to the left or right half of the visible area of :CurrentScreen:, ⌃⌥↑ or ⌃⌥↓ to the top or bottom half, and ⌃⌥↩ to the whole area.
+  - Frames keep an 8-point gap from the area edges and from the middle.
+  - Pressing the same ⌃⌥← or ⌃⌥→ again while the window is in that half changes it to that side's third, then two thirds, then back to the half.
+
+- Pressing ⌘S in :Palette: remembers the current arrangement of the selected room when that room is :CurrentRoom: and the arrangement matches a tidy layout.
+  - :WindowCatalog: reads the current frame of each found window of the room.
+  - When every frame is within 24 points on each edge of the frame :LayoutEngine: computes for Focus, Columns, or Grid, the room's :Layout: becomes that layout, the windows move to the exact computed frames, and :RoomList: is written.
+  - ⌘S does nothing when the selected room is not :CurrentRoom:.
+  - The bottom of :Palette: shows the key hint "⌘S Remember mine".
+
+- Pressing ⌘S in :Palette: when the arrangement of :CurrentRoom: matches no tidy layout saves it as My Layout.
+  - Each frame is snapped so its edges lie on a 16-point grid of the visible area, and windows whose edges are within 16 points of each other get exactly an 8-point gap.
+  - The snapped frames become the room's My Layout frames, its :Layout: becomes My Layout, the windows move to the snapped frames, and :RoomList: is written.
+
+- Right-clicking a room row in :Palette: opens a context menu with Edit Windows…, Rename…, and Delete.
+  - The selected row also shows "↵" and an ⓧ button at its right end, after the direct key or "Current".
+
+- Deleting a :Room: with the ⓧ on its row, Delete in its context menu, or ⌘⌫ on the selected row removes it from :RoomList: and writes :RoomList: to disk.
+  - When it was :CurrentRoom:, :CurrentRoom: becomes none.
+  - No window is moved, hidden, or closed.
+  - The row below it, or the last row, becomes selected.
+
+  ***acceptance tests***
+  - Deleting the :CurrentRoom: with ⌘⌫ leaves :CurrentRoom: as none, the :MenuBarItem: header reads "No room", and no window in :WindowCatalog: was moved, hidden, minimized, or closed.
+    - Deleting the last row selects the new last row.
+
+- Rename… in a row's context menu, or in the :MenuBarItem: menu for :CurrentRoom:, opens a dialog "Rename “<name>”" with a text field holding the name and the buttons Cancel and Rename.
+  - Rename is enabled only when the trimmed text is not empty and no other :Room: has that name, ignoring case; otherwise the dialog shows "A room with this name already exists".
+  - Rename sets the name and writes :RoomList: to disk; ↵ triggers Rename and Esc triggers Cancel.
+
+  ***acceptance tests***
+  - Renaming Design to `deep work` while Deep Work exists disables Rename and shows "A room with this name already exists"; renaming it to `Design 2` succeeds and the new name is in a :RoomList: reloaded from disk.
+
+- Edit Windows… in a row's context menu, or in the :MenuBarItem: menu for :CurrentRoom:, opens :WindowPicker: for that room, titled "Edit the windows of “<name>”", with the button Save Room in place of Create Room.
+  - The cards of the room's found windows start selected, numbered in room order; a saved window that is not found is left out.
+  - Clicking a selected card removes it from the selection; clicking it again appends it at the end.
+  - Save Room replaces the room's windows with the selected cards in place-number order, measures their minimum sizes again, drops the My Layout frames when the set of windows changed, writes :RoomList: to disk, and closes :WindowPicker:.
+  - When the room is :CurrentRoom:, it is shown again after saving.
+
+- Pressing ⌘1 to ⌘9 in :Palette: gives the selected room that direct key and writes :RoomList: to disk.
+  - A :Room: that had that key loses it.
+  - Pressing the key the selected room already has clears its direct key.
+  - The bottom of :Palette: shows the key hint "⌘1–9 Key".
+
+  ***acceptance tests***
+  - Giving room A key 3, then room B key 3, leaves A without a key and B with key 3; pressing ⌘3 again on B clears B's key.
+    - Each state is present in a :RoomList: reloaded from disk.
+
+- Pressing ⌃⌥1 to ⌃⌥9 anywhere shows the :Room: with that direct key, as if chosen in :Palette:.
+  - When no :Room: has that key, nothing happens.
+
+- :GettingStarted: opens from Getting Started in the :MenuBarItem: menu, and on the first launch of :RoomsApp:.
+  - It is a window centered on :CurrentScreen: with the title "Getting Started" and four numbered steps: 1 Open the windows a project needs. 2 Press ⌥Space, type a name for the room, and press ↵. 3 Click the windows that belong in it; the number on a card is its place, and 1 is the main window. Then Create Room. 4 Press ⇥ in ⌥Space to change the layout.
+  - Below the steps: "From then on, ⌥Space and the room's name, or ⌃⌥1–9, brings it back." and a Done button that closes the window.
+
+- The key hints at the bottom of :Palette: form one row: "Here: <resolved layout name>", "⇥ Layout", "⌘S Remember mine", and "⌘1–9 Key" on the left, and "↵ Go" and "esc Close" on the right in a lighter color.
+  - "Here: <resolved layout name>" is omitted when no room is selected.
+  - "⇥ Layout" shows the tab symbol as an arrow to a bar.
+
+- :Palette:, :WindowPicker:, :GettingStarted:, and the dialogs of :RoomsApp: use the light appearance regardless of the system appearance.

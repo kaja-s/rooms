@@ -1,0 +1,3 @@
+import RoomsKit
+
+RoomsApp.main()
