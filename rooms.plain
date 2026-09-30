@@ -37,6 +37,13 @@ description: Menu bar Mac app that saves a project's windows as a named room and
 - :LayoutPreviewDesign: is the visual design of the layout preview overlay.
   - It is described in [resources/layout-preview-design.md](resources/layout-preview-design.md).
 
+- :Notification: is a short message of :RoomsApp: shown briefly above everything on :CurrentScreen:, such as "Open <application>, then open “<room name>” again".
+  - Message: the text (required)
+  - Applications: the bundle identifiers and names of the applications the message is about, in order (optional)
+
+- :NotificationDesign: is the visual design of :Notification:.
+  - It is described in [resources/notification-design.md](resources/notification-design.md).
+
 - :Room: is a named set of :AppWindow: items with the :Layout: they are shown in.
   - Name (required, unique among rooms, case-insensitive)
   - Windows: ordered list of :AppWindow: items; position 1 is the main window (required, at least one)
@@ -68,7 +75,17 @@ description: Menu bar Mac app that saves a project's windows as a named room and
 
 - The :Palette: panel is borderless, non-opaque, with a clear background; its SwiftUI content fills the panel exactly and draws the rounded shape, fill, and border itself, and the panel shadow is invalidated after every resize so it follows the rounded shape.
 
+- `AppController` publishes the latest :Notification: as `notification` (a `RoomsNotification` with `message` and `applications`); `NotificationDesign` in `RoomsKit` holds its checkable :NotificationDesign: values.
+
+- :Notification: is a borderless, non-activating `NSPanel` with SwiftUI content in `NSHostingView`, at window level `.popUpMenu`, with the collection behavior `.canJoinAllSpaces`, `.fullScreenAuxiliary`, `.stationary`, and `.ignoresCycle`, ignoring mouse events and never becoming key.
+
 - :WindowCatalog: uses the Accessibility API (`AXUIElement`) to list, move, resize, raise, minimize, and focus windows, `NSRunningApplication` to hide and activate applications, and `CGWindowListCopyWindowInfo` for window ids and z-order.
+
+- :WindowCatalog: finds full-screen windows through `CGWindowListCopyWindowInfo` (a window of the application at layer 0 whose bounds equal a screen's frame and that the Accessibility API does not list), because the Accessibility API lists only the windows of the current Space; it takes one out of full screen by activating the application with `NSRunningApplication` and setting the window's `AXFullScreen` attribute to false.
+
+- :WindowCatalog: finds the applications with a window on another desktop through `CGWindowListCopyWindowInfo`: a window of the application at layer 0, at least 100 by 100 points, not on the current Space, not in full screen, and not listed by the Accessibility API.
+
+- `FakeWindowSystem` can put a window in full screen or on another desktop; such a window is not listed, like the Accessibility API.
 
 - :AppWindow: identity is the application bundle identifier, the process identifier, and the `CGWindowID`; :WindowCatalog: pairs an Accessibility window element with its `CGWindowID` through the private function `_AXUIElementGetWindow`.
 
@@ -212,18 +229,23 @@ description: Menu bar Mac app that saves a project's windows as a named room and
 - Pressing ↵ on a room row in :Palette:, or clicking the row, shows the :Room:.
   - :Palette: closes.
   - :WindowCatalog: finds each :AppWindow: of the room.
+  - When a window is not found and its application has a window in full screen, that window is taken out of full screen first; :RoomsApp: waits until it is listed again, at most 2 seconds, and then finds the room's windows again.
   - :LayoutEngine: computes frames on :CurrentScreen: for the found windows in room order using the room's :Layout:, resolving Auto as defined.
   - Each found window is unminimized, moved to its frame, and raised; the main window is raised last and gets keyboard focus.
   - When any :AppWindow: of the room is not found, because its application quit or its window was closed, nothing moves and a notification "Open <application names>, then open “<name>” again" is shown.
   - The names are those of the applications of the windows not found, each once in room order, joined with ", " and a final " and ".
+  - When the application of every window not found has a window on another desktop, the notification is instead "<application names> is on another desktop. Move it to this one, then open “<name>” again", with "are" and "them" for more than one application; nothing moves.
 
   ***acceptance tests***
   - Showing a Focus room with three found windows on a 1440 by 900 visible area places window 1 at the left two-thirds frame and windows 2 and 3 stacked in the right third.
     - Window 2 was minimized before and is unminimized.
     - Window 1 is raised last and has keyboard focus.
-  - Showing the room Design, whose windows belong to Figma, Linear, and Dia, after Figma quit moves no window and shows "Open Figma, then open “Design” again".
-    - With Figma and Linear quit, the notification is "Open Figma and Linear, then open “Design” again".
-  - Showing Design after the Figma window was closed while Figma keeps running moves no window and shows "Open Figma, then open “Design” again".
+  - Showing a room R whose windows belong to applications A, B, and C, in that order, after A quit moves no window and shows "Open A, then open “R” again".
+    - With A and B quit, the notification is "Open A and B, then open “R” again".
+  - Showing R after the window of A was closed while A keeps running moves no window and shows "Open A, then open “R” again".
+  - Showing R while the window of C is on another desktop moves no window and shows "C is on another desktop. Move it to this one, then open “R” again".
+    - With the windows of B and C on another desktop, the notification is "B and C are on another desktop. Move them to this one, then open “R” again".
+  - Showing R on Columns while the window of A is in full screen takes that window out of full screen and moves it to its Columns frame, with no notification.
 
 - Showing a :Room: hides every window that is not in the room.
   - Every running application with no found window in the room is hidden.
@@ -321,7 +343,7 @@ description: Menu bar Mac app that saves a project's windows as a named room and
   - "Here: <resolved layout name>" is omitted when no room is selected.
   - "⇥ Layout" shows the tab symbol as an arrow to a bar.
 
-- :Palette:, :WindowPicker:, :GettingStarted:, and the dialogs of :RoomsApp: use the light appearance regardless of the system appearance.
+- :Palette:, :WindowPicker:, :GettingStarted:, :Notification:, and the dialogs of :RoomsApp: use the light appearance regardless of the system appearance.
 
 - :Palette: is drawn per :PaletteDesign:.
   - :Palette: is 640 points wide with a 22-point corner radius, and each row is 64 points high.
@@ -334,3 +356,12 @@ description: Menu bar Mac app that saves a project's windows as a named room and
   - With three :Room: items and an empty text field, `PaletteViewModel.panelHeight` is 349, and with nine it is 757.
   - With one :Room: named "alpha", typing "zz" leaves only the Create row, and `PaletteViewModel.panelHeight` is 213; typing "a" then shows "alpha" and the Create row, and it is 281.
   - With an empty :RoomList: and an empty text field, `PaletteViewModel.panelHeight` is 213.
+
+- :Notification: is drawn per :NotificationDesign:, above every other window of :RoomsApp: and of other applications, on every Space and over full-screen applications.
+  - The notifications about windows not found list the applications of those windows, and show their icons before the message.
+  - It is centered at the top of the visible area of :CurrentScreen:, stays 4 seconds, and a new :Notification: replaces the one showing.
+  - It never takes keyboard focus, and clicks pass through it.
+
+  ***acceptance tests***
+  - Showing a room R whose windows belong to applications A, B, and C, in that order, with A and B quit publishes a :Notification: with the message "Open A and B, then open “R” again" and the applications A and B, in that order.
+  - `NotificationDesign` has the fill #FAFAFC, the corner radius 16, the accent #3B76F6, and the duration 4 seconds.

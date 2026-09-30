@@ -24,10 +24,10 @@ final class DialogPresenter: NSObject, NSWindowDelegate {
             .compactMap { $0 }
             .sink { [weak self] dialog in self?.showPermissionDialog(dialog) }
             .store(in: &cancellables)
-        controller.$notificationMessage
+        controller.$notification
             .receive(on: RunLoop.main)
             .compactMap { $0 }
-            .sink { [weak self] message in self?.showNotification(message) }
+            .sink { [weak self] notification in self?.showNotification(notification) }
             .store(in: &cancellables)
     }
 
@@ -77,36 +77,106 @@ final class DialogPresenter: NSObject, NSWindowDelegate {
 
     // MARK: Notification
 
-    private func showNotification(_ message: String) {
+    /// Shows a notification per NotificationDesign above every window, on every Space and over full-screen apps.
+    /// A new notification replaces the one showing and restarts its duration.
+    private func showNotification(_ notification: RoomsNotification) {
         notificationTimer?.invalidate()
         notificationPanel?.orderOut(nil)
-        let label = NSTextField(labelWithString: message)
-        label.font = .systemFont(ofSize: 14, weight: .medium)
-        label.textColor = .white
-        label.sizeToFit()
-        let padding: CGFloat = 18
-        let size = NSSize(width: label.frame.width + 2 * padding, height: label.frame.height + 2 * padding)
-        let panel = NSPanel(contentRect: NSRect(origin: .zero, size: size), styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
-        panel.level = .statusBar
+        let icons = notification.applications.prefix(NotificationDesign.maxIcons).compactMap {
+            controller.windowSystem.icon(forBundleIdentifier: $0.bundleIdentifier)
+        }
+        let hosting = NSHostingView(rootView: NotificationView(message: notification.message, icons: Array(icons)))
+        let size = hosting.fittingSize
+        let panel = NotificationPanel(contentRect: NSRect(origin: .zero, size: size),
+                                      styleMask: [.borderless, .nonactivatingPanel],
+                                      backing: .buffered, defer: false)
+        panel.level = .popUpMenu
+        panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary, .ignoresCycle]
         panel.isOpaque = false
         panel.backgroundColor = .clear
         panel.hasShadow = true
         panel.ignoresMouseEvents = true
-        let container = NSVisualEffectView(frame: NSRect(origin: .zero, size: size))
-        container.material = .hudWindow
-        container.state = .active
-        container.wantsLayer = true
-        container.layer?.cornerRadius = 12
-        label.frame.origin = NSPoint(x: padding, y: padding)
-        container.addSubview(label)
-        panel.contentView = container
+        panel.hidesOnDeactivate = false
+        panel.contentView = hosting
         let area = controller.windowSystem.currentScreenVisibleArea()
-        panel.setFrameOrigin(NSPoint(x: area.midX - size.width / 2, y: area.maxY - size.height - 24))
+        panel.setFrameOrigin(NSPoint(x: (area.midX - size.width / 2).rounded(),
+                                     y: (area.maxY - NotificationDesign.topInset - size.height).rounded()))
+        panel.alphaValue = 0
         panel.orderFrontRegardless()
+        panel.invalidateShadow()
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = NotificationDesign.fadeInDuration
+            panel.animator().alphaValue = 1
+        }
         notificationPanel = panel
-        notificationTimer = Timer.scheduledTimer(withTimeInterval: 2.5, repeats: false) { [weak self] _ in
-            self?.notificationPanel?.orderOut(nil)
-            self?.notificationPanel = nil
+        notificationTimer = Timer.scheduledTimer(withTimeInterval: NotificationDesign.duration, repeats: false) { [weak self, weak panel] _ in
+            guard let panel else { return }
+            NSAnimationContext.runAnimationGroup({ context in
+                context.duration = NotificationDesign.fadeOutDuration
+                panel.animator().alphaValue = 0
+            }, completionHandler: {
+                panel.orderOut(nil)
+                if self?.notificationPanel === panel { self?.notificationPanel = nil }
+            })
+        }
+    }
+}
+
+/// A notification never becomes key or main, so it never takes keyboard focus.
+private final class NotificationPanel: NSPanel {
+    override var canBecomeKey: Bool { false }
+    override var canBecomeMain: Bool { false }
+}
+
+/// The notification content: the missing applications' icons (or an alert symbol), a "Rooms" caption, and the message.
+struct NotificationView: View {
+    let message: String
+    let icons: [NSImage]
+
+    private var shape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: NotificationDesign.cornerRadius, style: .continuous)
+    }
+
+    var body: some View {
+        HStack(alignment: .center, spacing: NotificationDesign.iconToText) {
+            iconCluster
+            VStack(alignment: .leading, spacing: 2) {
+                Text(NotificationDesign.caption)
+                    .font(.system(size: NotificationDesign.captionFontSize))
+                    .foregroundStyle(Color(hex: NotificationDesign.textSecondaryHex))
+                Text(message)
+                    .font(.system(size: NotificationDesign.messageFontSize, weight: .medium))
+                    .foregroundStyle(Color(hex: NotificationDesign.textPrimaryHex))
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: NotificationDesign.maxWidth - 120, alignment: .leading)
+        }
+        .padding(.vertical, NotificationDesign.paddingVertical)
+        .padding(.leading, NotificationDesign.paddingLeading)
+        .padding(.trailing, NotificationDesign.paddingTrailing)
+        .frame(minWidth: NotificationDesign.minWidth, alignment: .leading)
+        .fixedSize()
+        .background(Color(hex: NotificationDesign.fillHex, opacity: NotificationDesign.fillOpacity), in: shape)
+        .overlay(shape.strokeBorder(Color.black.opacity(NotificationDesign.borderOpacity), lineWidth: 1))
+        .clipShape(shape)
+        .environment(\.colorScheme, .light)
+    }
+
+    @ViewBuilder private var iconCluster: some View {
+        if icons.isEmpty {
+            Image(systemName: NotificationDesign.fallbackSymbol)
+                .font(.system(size: NotificationDesign.fallbackIconSize))
+                .foregroundStyle(Color(hex: NotificationDesign.accentHex))
+        } else {
+            HStack(spacing: -NotificationDesign.iconOverlap) {
+                ForEach(Array(icons.enumerated()), id: \.offset) { _, icon in
+                    Image(nsImage: icon)
+                        .resizable()
+                        .frame(width: NotificationDesign.iconSize, height: NotificationDesign.iconSize)
+                        .clipShape(RoundedRectangle(cornerRadius: NotificationDesign.iconCornerRadius, style: .continuous))
+                }
+            }
         }
     }
 }

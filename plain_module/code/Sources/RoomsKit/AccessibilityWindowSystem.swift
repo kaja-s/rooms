@@ -220,6 +220,84 @@ public final class AccessibilityWindowSystem: WindowSystem {
         AXUIElementSetAttributeValue(element, kAXFocusedAttribute as CFString, kCFBooleanTrue)
     }
 
+    // MARK: Full screen
+
+    /// Applications with a window on a full-screen Space: a layer-0 window, not on the current Space, whose bounds
+    /// equal a display's bounds. The Accessibility API does not list such a window from another Space.
+    public func applicationsWithFullScreenWindows() -> Set<Int32> {
+        let screens = displayBounds()
+        let onScreen = Set(((CGWindowListCopyWindowInfo([.optionOnScreenOnly], kCGNullWindowID) as? [[String: Any]]) ?? [])
+            .compactMap { $0[kCGWindowNumber as String] as? CGWindowID })
+        let all = (CGWindowListCopyWindowInfo([.optionAll, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]]) ?? []
+        var result = Set<Int32>()
+        for info in all {
+            guard (info[kCGWindowLayer as String] as? Int) == 0,
+                  let number = info[kCGWindowNumber as String] as? CGWindowID, !onScreen.contains(number),
+                  let pid = info[kCGWindowOwnerPID as String] as? Int32,
+                  let boundsInfo = info[kCGWindowBounds as String] as? NSDictionary,
+                  let bounds = CGRect(dictionaryRepresentation: boundsInfo),
+                  screens.contains(bounds.integral) else { continue }
+            result.insert(pid)
+        }
+        return result
+    }
+
+    /// Applications with a window on another desktop: a layer-0 window of at least 100 by 100 points, not on the
+    /// current Space, not in full screen, and not listed by the Accessibility API (minimized windows and windows of
+    /// hidden applications are listed, so they are excluded).
+    public func applicationsWithWindowsOnOtherDesktops() -> Set<Int32> {
+        let screens = displayBounds()
+        let listed = Set(listWindows().map { $0.identity.windowID })
+        let onScreen = Set(((CGWindowListCopyWindowInfo([.optionOnScreenOnly], kCGNullWindowID) as? [[String: Any]]) ?? [])
+            .compactMap { $0[kCGWindowNumber as String] as? CGWindowID })
+        let own = ProcessInfo.processInfo.processIdentifier
+        let all = (CGWindowListCopyWindowInfo([.optionAll, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]]) ?? []
+        var result = Set<Int32>()
+        for info in all {
+            guard (info[kCGWindowLayer as String] as? Int) == 0,
+                  let number = info[kCGWindowNumber as String] as? CGWindowID,
+                  !onScreen.contains(number), !listed.contains(number),
+                  let pid = info[kCGWindowOwnerPID as String] as? Int32, pid != own,
+                  let boundsInfo = info[kCGWindowBounds as String] as? NSDictionary,
+                  let bounds = CGRect(dictionaryRepresentation: boundsInfo),
+                  bounds.width >= 100, bounds.height >= 100,
+                  !screens.contains(bounds.integral) else { continue }
+            result.insert(pid)
+        }
+        return result
+    }
+
+    private func displayBounds() -> [CGRect] {
+        var displayCount: UInt32 = 0
+        CGGetActiveDisplayList(0, nil, &displayCount)
+        var displays = [CGDirectDisplayID](repeating: 0, count: Int(displayCount))
+        CGGetActiveDisplayList(displayCount, &displays, &displayCount)
+        return displays.map { CGDisplayBounds($0).integral }
+    }
+
+    /// Activates the application, which switches to its full-screen Space so the Accessibility API lists the window,
+    /// and sets `AXFullScreen` to false on each of its full-screen windows.
+    public func exitFullScreen(application processIdentifier: Int32) {
+        guard let app = NSRunningApplication(processIdentifier: processIdentifier) else { return }
+        app.activate()
+        let running = RunningApplication(bundleIdentifier: app.bundleIdentifier ?? "pid.\(processIdentifier)", processIdentifier: processIdentifier, name: app.localizedName ?? "")
+        for _ in 0..<15 {
+            let fullScreen = standardWindows(of: running).filter { _, element in
+                let value: Bool? = copyAttribute(element, "AXFullScreen")
+                return value == true
+            }
+            if !fullScreen.isEmpty {
+                for (identity, element) in fullScreen {
+                    let status = AXUIElementSetAttributeValue(element, "AXFullScreen" as CFString, kCFBooleanFalse)
+                    if status != .success { logger.error("Exit full screen failed for \(identity.windowID): \(status.rawValue)") }
+                }
+                return
+            }
+            wait(milliseconds: 100)
+        }
+        logger.error("No full-screen window found for \(running.name, privacy: .public)")
+    }
+
     public func isHidden(application processIdentifier: Int32) -> Bool {
         NSRunningApplication(processIdentifier: processIdentifier)?.isHidden ?? false
     }

@@ -18,6 +18,10 @@ public final class FakeWindowSystem: WindowSystem {
         public var resizeDelayMilliseconds = 0
         /// When set, size changes are ignored; only the origin of a requested frame is applied.
         public var ignoresResize = false
+        /// A full-screen window is not listed, like the Accessibility API on another Space.
+        public var isFullScreen = false
+        /// A window on another desktop is not listed, like the Accessibility API.
+        public var isOnOtherDesktop = false
         var pending: (frame: CGRect, at: Int)?
 
         public static func == (lhs: Window, rhs: Window) -> Bool {
@@ -25,6 +29,7 @@ public final class FakeWindowSystem: WindowSystem {
                 && lhs.frame == rhs.frame && lhs.minimumSize == rhs.minimumSize && lhs.isMinimized == rhs.isMinimized
                 && lhs.isStandard == rhs.isStandard && lhs.isRoomsOwn == rhs.isRoomsOwn
                 && lhs.resizeDelayMilliseconds == rhs.resizeDelayMilliseconds && lhs.ignoresResize == rhs.ignoresResize
+                && lhs.isFullScreen == rhs.isFullScreen && lhs.isOnOtherDesktop == rhs.isOnOtherDesktop
         }
 
         public init(identity: WindowIdentity, applicationName: String, title: String, frame: CGRect, minimumSize: CGSize = .zero, isMinimized: Bool = false, isStandard: Bool = true, isRoomsOwn: Bool = false) {
@@ -48,6 +53,7 @@ public final class FakeWindowSystem: WindowSystem {
         case unminimize(WindowIdentity)
         case hide(Int32)
         case unhide(Int32)
+        case exitFullScreen(Int32)
         case openAccessibilitySettings
     }
 
@@ -88,6 +94,33 @@ public final class FakeWindowSystem: WindowSystem {
         windows[i].ignoresResize = ignoresResize
     }
 
+    /// Puts a window in or out of full screen.
+    public func setFullScreen(_ fullScreen: Bool, of identity: WindowIdentity) {
+        guard let i = index(of: identity) else { return }
+        windows[i].isFullScreen = fullScreen
+    }
+
+    /// Moves a window to another desktop, or back to the current one.
+    public func setOnOtherDesktop(_ onOther: Bool, of identity: WindowIdentity) {
+        guard let i = index(of: identity) else { return }
+        windows[i].isOnOtherDesktop = onOther
+    }
+
+    public func applicationsWithWindowsOnOtherDesktops() -> Set<Int32> {
+        Set(windows.filter { $0.isOnOtherDesktop && !$0.isFullScreen }.map { $0.identity.processIdentifier })
+    }
+
+    public func applicationsWithFullScreenWindows() -> Set<Int32> {
+        Set(windows.filter { $0.isFullScreen }.map { $0.identity.processIdentifier })
+    }
+
+    public func exitFullScreen(application processIdentifier: Int32) {
+        operations.append(.exitFullScreen(processIdentifier))
+        for i in windows.indices where windows[i].identity.processIdentifier == processIdentifier {
+            windows[i].isFullScreen = false
+        }
+    }
+
     /// Removes the application and all its windows.
     public func quitApplication(processIdentifier: Int32) {
         applications.removeAll { $0.processIdentifier == processIdentifier }
@@ -123,7 +156,7 @@ public final class FakeWindowSystem: WindowSystem {
     public func runningApplications() -> [RunningApplication] { applications }
 
     public func listWindows() -> [AppWindow] {
-        windows.filter { $0.isStandard && !$0.isRoomsOwn }.map {
+        windows.filter { $0.isStandard && !$0.isRoomsOwn && !$0.isFullScreen && !$0.isOnOtherDesktop }.map {
             AppWindow(identity: $0.identity, applicationName: $0.applicationName, title: $0.title, frame: $0.frame, minimumSize: .zero)
         }
     }

@@ -16,8 +16,10 @@ public final class AppController: ObservableObject {
 
     @Published public private(set) var rooms: [Room] = []
     @Published public private(set) var currentRoomID: UUID?
-    /// The most recent notification message shown to the user.
-    @Published public private(set) var notificationMessage: String?
+    /// The most recent notification shown to the user; a new one replaces the one showing.
+    @Published public private(set) var notification: RoomsNotification?
+    /// The message of the most recent notification.
+    public var notificationMessage: String? { notification?.message }
     public private(set) var notificationHistory: [String] = []
     @Published public private(set) var permissionDialog: PermissionDialogModel?
     @Published public private(set) var renameDialog: RenameDialogModel?
@@ -79,8 +81,8 @@ public final class AppController: ObservableObject {
         }
     }
 
-    private func notify(_ message: String) {
-        notificationMessage = message
+    private func notify(_ message: String, applications: [RoomsNotification.Application] = []) {
+        notification = RoomsNotification(message: message, applications: applications)
         notificationHistory.append(message)
     }
 
@@ -208,10 +210,13 @@ public final class AppController: ObservableObject {
         guard let room = room(id) else { return }
         palette.close()
         guard let open = listWindowsOrPrompt() else { return }
-        let found = foundWindows(of: room, among: open)
+        var found = foundWindows(of: room, among: open)
+        if found.count < room.windows.count, leaveFullScreen(forMissingWindowsOf: room, found: found) {
+            found = waitForWindows(of: room, found: found)
+        }
         let missing = missingApplications(of: room, found: found)
         guard missing.isEmpty else {
-            notify("Open \(Self.joinedNames(missing)), then open “\(room.name)” again")
+            notifyMissing(missing, room: room)
             return
         }
         let area = windowSystem.currentScreenVisibleArea()
@@ -270,15 +275,53 @@ public final class AppController: ObservableObject {
     }
 
     /// ⌘S: recognizes a tidy layout from the current arrangement, or saves it as My Layout. Only for the current room.
+    /// Takes the full-screen windows of the applications of the room's missing windows out of full screen.
+    /// Returns whether any application was asked to leave full screen.
+    private func leaveFullScreen(forMissingWindowsOf room: Room, found: [FoundWindow]) -> Bool {
+        let foundIndices = Set(found.map { $0.index })
+        let missingBundles = Set(room.windows.indices.filter { !foundIndices.contains($0) }.map { room.windows[$0].bundleIdentifier })
+        let fullScreen = windowSystem.applicationsWithFullScreenWindows()
+        let apps = windowSystem.runningApplications().filter { missingBundles.contains($0.bundleIdentifier) && fullScreen.contains($0.processIdentifier) }
+        for app in apps { windowSystem.exitFullScreen(application: app.processIdentifier) }
+        return !apps.isEmpty
+    }
+
+    /// "Dia is on another desktop…" when every missing application has a window on another desktop; otherwise "Open …".
+    private func notifyMissing(_ missing: [RoomsNotification.Application], room: Room) {
+        let elsewhere = windowSystem.applicationsWithWindowsOnOtherDesktops()
+        let pids = Dictionary(windowSystem.runningApplications().map { ($0.bundleIdentifier, $0.processIdentifier) }, uniquingKeysWith: { a, _ in a })
+        let names = Self.joinedNames(missing.map { $0.name })
+        let allElsewhere = missing.allSatisfy { app in pids[app.bundleIdentifier].map { elsewhere.contains($0) } ?? false }
+        if allElsewhere {
+            let (verb, pronoun) = missing.count == 1 ? ("is", "it") : ("are", "them")
+            notify("\(names) \(verb) on another desktop. Move \(pronoun) to this one, then open “\(room.name)” again", applications: missing)
+        } else {
+            notify("Open \(names), then open “\(room.name)” again", applications: missing)
+        }
+    }
+
+    /// Lists the windows again every 100 ms, for at most 2 seconds, until every window of the room is found.
+    private func waitForWindows(of room: Room, found initial: [FoundWindow]) -> [FoundWindow] {
+        var found = initial
+        var waited = 0
+        while found.count < room.windows.count && waited < 2000 {
+            windowSystem.wait(milliseconds: 100)
+            waited += 100
+            found = foundWindows(of: room, among: catalog.listWindows() ?? [])
+        }
+        return found
+    }
+
     /// Names of the applications of the room's windows that were not found (the application quit or the window was
     /// closed), in room order, each once.
-    private func missingApplications(of room: Room, found: [FoundWindow]) -> [String] {
+    private func missingApplications(of room: Room, found: [FoundWindow]) -> [RoomsNotification.Application] {
         let foundIndices = Set(found.map { $0.index })
-        var names: [String] = []
-        for (index, window) in room.windows.enumerated() where !foundIndices.contains(index) && !names.contains(window.applicationName) {
-            names.append(window.applicationName)
+        var missing: [RoomsNotification.Application] = []
+        for (index, window) in room.windows.enumerated()
+        where !foundIndices.contains(index) && !missing.contains(where: { $0.name == window.applicationName }) {
+            missing.append(RoomsNotification.Application(bundleIdentifier: window.bundleIdentifier, name: window.applicationName))
         }
-        return names
+        return missing
     }
 
     /// "A", "A and B", "A, B and C".

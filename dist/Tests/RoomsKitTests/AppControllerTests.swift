@@ -62,6 +62,41 @@ final class AppControllerTests: XCTestCase {
         XCTAssertNil(h.controller.currentRoomID)
     }
 
+    func testNotificationCarriesMissingApplications() {
+        let h = TestHarness()
+        let x = h.app("x", pid: 1, name: "X")
+        let a = h.window(x, id: 1, title: "A")
+        h.seed([Room(name: "Gone", windows: [a, a])])
+        h.fake.quitApplication(processIdentifier: 1)
+        h.controller.showRoom(id: h.controller.rooms[0].id)
+        XCTAssertEqual(h.controller.notification, RoomsNotification(message: "Open X, then open “Gone” again",
+                                                                    applications: [.init(bundleIdentifier: "x", name: "X")]))
+    }
+
+    func testFullScreenWindowIsTakenOutOfFullScreenBeforeShowing() {
+        let h = TestHarness()
+        let x = h.app("x", pid: 1, name: "X")
+        let a = h.window(x, id: 1, title: "A")
+        h.seed([Room(name: "R", windows: [a], layout: .focus)])
+        h.fake.setFullScreen(true, of: a.identity)
+        h.controller.showRoom(id: h.controller.rooms[0].id)
+        XCTAssertEqual(h.fake.operations.first, .exitFullScreen(1))
+        XCTAssertEqual(h.controller.currentRoomID, h.controller.rooms[0].id)
+        XCTAssertNil(h.controller.notification)
+    }
+
+    func testWindowOnAnotherDesktopIsReportedThere() {
+        let h = TestHarness()
+        let x = h.app("x", pid: 1, name: "X")
+        let a = h.window(x, id: 1, title: "A")
+        h.seed([Room(name: "R", windows: [a], layout: .focus)])
+        h.fake.setOnOtherDesktop(true, of: a.identity)
+        XCTAssertEqual(h.fake.applicationsWithWindowsOnOtherDesktops(), [1])
+        h.controller.showRoom(id: h.controller.rooms[0].id)
+        XCTAssertEqual(h.controller.notificationMessage, "X is on another desktop. Move it to this one, then open “R” again")
+        XCTAssertFalse(h.fake.operations.contains(.exitFullScreen(1)), "a window on another desktop is not full screen")
+    }
+
     func testJoinedNames() {
         XCTAssertEqual(AppController.joinedNames(["A"]), "A")
         XCTAssertEqual(AppController.joinedNames(["A", "B"]), "A and B")

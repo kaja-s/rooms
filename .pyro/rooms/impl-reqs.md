@@ -22,8 +22,23 @@
 - [x] The :Palette: panel is borderless, non-opaque, with a clear background; its SwiftUI content fills the panel exactly and draws the rounded shape, fill, and border itself, and the panel shadow is invalidated after every resize so it follows the rounded shape.
   Verified: styleMask .borderless, isOpaque=false, backgroundColor .clear; PaletteView framed to panelWidth × panelHeight and draws the rounded fill, border, and clip; invalidateShadow() after every setFrame
 
+- [x] `AppController` publishes the latest :Notification: as `notification` (a `RoomsNotification` with `message` and `applications`); `NotificationDesign` in `RoomsKit` holds its checkable :NotificationDesign: values.
+  Verified: AppController.@Published notification: RoomsNotification? (message, applications); NotificationDesign enum in ViewModels.swift holds the design values
+
+- [x] :Notification: is a borderless, non-activating `NSPanel` with SwiftUI content in `NSHostingView`, at window level `.popUpMenu`, with the collection behavior `.canJoinAllSpaces`, `.fullScreenAuxiliary`, `.stationary`, and `.ignoresCycle`, ignoring mouse events and never becoming key.
+  Verified: DialogPresenter.showNotification builds a NotificationPanel (.borderless, .nonactivatingPanel; canBecomeKey/Main false) hosting NotificationView in NSHostingView, level .popUpMenu, collectionBehavior [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary, .ignoresCycle], ignoresMouseEvents
+
 - [x] :WindowCatalog: uses the Accessibility API (`AXUIElement`) to list, move, resize, raise, minimize, and focus windows, `NSRunningApplication` to hide and activate applications, and `CGWindowListCopyWindowInfo` for window ids and z-order.
   - Verified: AccessibilityWindowSystem uses AXUIElement, NSRunningApplication, CGWindowListCopyWindowInfo
+
+- [x] :WindowCatalog: finds full-screen windows through `CGWindowListCopyWindowInfo` (a window of the application at layer 0 whose bounds equal a screen's frame and that the Accessibility API does not list), because the Accessibility API lists only the windows of the current Space; it takes one out of full screen by activating the application with `NSRunningApplication` and setting the window's `AXFullScreen` attribute to false.
+  Verified: AccessibilityWindowSystem.applicationsWithFullScreenWindows uses CGWindowListCopyWindowInfo (layer 0, not on screen, bounds equal a CGDisplayBounds); exitFullScreen activates via NSRunningApplication and sets AXFullScreen false; AppController.showRoom calls them for apps of missing windows
+
+- [x] :WindowCatalog: finds the applications with a window on another desktop through `CGWindowListCopyWindowInfo`: a window of the application at layer 0, at least 100 by 100 points, not on the current Space, not in full screen, and not listed by the Accessibility API.
+  Verified: AccessibilityWindowSystem.applicationsWithWindowsOnOtherDesktops uses CGWindowListCopyWindowInfo: layer 0, ≥ 100×100, not on screen, not display-sized (full screen), not in listWindows(); AppController.notifyMissing uses it for the "on another desktop" message
+
+- [x] `FakeWindowSystem` can put a window in full screen or on another desktop; such a window is not listed, like the Accessibility API.
+  Verified: FakeWindowSystem.setFullScreen/setOnOtherDesktop; listWindows skips both; applicationsWithFullScreenWindows / applicationsWithWindowsOnOtherDesktops report them
 
 - [x] :AppWindow: identity is the application bundle identifier, the process identifier, and the `CGWindowID`; :WindowCatalog: pairs an Accessibility window element with its `CGWindowID` through the private function `_AXUIElementGetWindow`.
   - Verified: WindowIdentity(bundleIdentifier, processIdentifier, windowID) via _AXUIElementGetWindow

@@ -92,8 +92,16 @@ All scenarios drive `AppController` and its view models through `FakeWindowSyste
 - S13.4 Every saved window must be found; the main window is raised last and focused.
 - S13.5 Any saved window not found (application quit, or window closed while the app runs) → nothing moved/hidden/raised, CurrentRoom unchanged, notification "Open <apps>, then open “<name>” again"; apps of the unfound windows, each once in room order, joined ", " with a final " and ".
 - S13.6 The same check applies to ⌃⌥1–9 direct keys.
-- AT13.b Design (Figma, Linear, Dia): Figma quit → "Open Figma, then open “Design” again"; Figma and Linear quit → "Open Figma and Linear, then open “Design” again".
-- AT13.c Figma window closed while Figma runs → no moves, "Open Figma, then open “Design” again".
+- S13.7 A room window not found whose application has a full-screen window: that application's full-screen windows leave full screen first; windows are listed again every 100 ms for at most 2 s until all room windows are found; then the room is shown normally (no notification).
+- S13.8 If the window is still not found after 2 s, the missing-app notification is shown and nothing moves.
+- S13.9 Applications without a full-screen window are not asked to leave full screen.
+- S13.10 Every missing window's app has a window on another desktop (not full screen) → nothing moves, notification "<apps> is on another desktop. Move it to this one, then open “<name>” again"; "are"/"them" for two or more; notification applications are those apps.
+- S13.11 If any missing window's app has no window on another desktop (quit or closed), the "Open …" notification is used instead.
+- S13.12 Full-screen windows are handled first (S13.7) and are not reported as on another desktop.
+- AT13.e C on another desktop → "C is on another desktop. Move it to this one, then open “R” again"; B and C → "B and C are on another desktop. Move them to this one, then open “R” again".
+- AT13.d Columns room R with its A window in full screen → A leaves full screen, its window moves to its Columns frame, no notification.
+- AT13.b room R (apps A, B, C): A quit → "Open A, then open “R” again"; A and B quit → "Open A and B, then open “R” again".
+- AT13.c A window closed while A runs → no moves, "Open A, then open “R” again".
 
 ## FS14 — Showing hides everything else
 - S14.1 Apps with no found window in the room are hidden.
@@ -201,3 +209,12 @@ All scenarios drive `AppController` and its view models through `FakeWindowSyste
 - AT31.b Three rooms → 349; nine rooms → 757.
 - AT31.c One room "alpha": typing "zz" → only the Create row, 213; typing "a" → "alpha" + Create row, 281.
 - AT31.d Empty RoomList, empty field → 213 (empty-state block).
+
+## FS32 — Notification drawn per NotificationDesign
+- S32.1 `AppController.notification` is a `RoomsNotification` with `message` and `applications` (bundle id + name, in order); `notificationMessage` mirrors the message.
+- S32.2 The windows-not-found notification lists the apps of the unfound windows, each once, in room order, matching the names in the message.
+- S32.3 A new notification replaces the one showing (the latest is published; history keeps all).
+- S32.4 `NotificationDesign`: fill #FAFAFC at 98%, border 8% black, radius 16, accent #3B76F6, text primary #1C1C1E / secondary #6E6E73, icon 28 radius 7 overlap 8, up to 4 icons, max width 520, min width 280, duration 4 s, fade in 150 ms / out 200 ms, top inset 12.
+- S32.5 Panel config (level .popUpMenu, all Spaces, full-screen auxiliary, stationary, ignores cycle, ignores mouse, never key) — verified by review (view layer; no window is opened in tests).
+- AT32.a room R (apps A, B, C), A and B quit → message "Open A and B, then open “R” again", applications [A, B].
+- AT32.b NotificationDesign fill #FAFAFC, radius 16, accent #3B76F6, duration 4.

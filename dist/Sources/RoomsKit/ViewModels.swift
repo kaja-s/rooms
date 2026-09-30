@@ -122,6 +122,56 @@ public enum PaletteDesign {
     public static let deleteGlyph = "ⓧ"
 }
 
+/// A short message shown briefly above everything on the current screen.
+public struct RoomsNotification: Equatable {
+    public struct Application: Equatable {
+        public var bundleIdentifier: String
+        public var name: String
+        public init(bundleIdentifier: String, name: String) {
+            self.bundleIdentifier = bundleIdentifier
+            self.name = name
+        }
+    }
+    public var message: String
+    /// The applications the message is about, in order; their icons are shown before the message.
+    public var applications: [Application]
+
+    public init(message: String, applications: [Application] = []) {
+        self.message = message
+        self.applications = applications
+    }
+}
+
+/// Checkable values of the notification design (resources/notification-design.md).
+public enum NotificationDesign {
+    public static let fillHex = "#FAFAFC"
+    public static let fillOpacity = 0.98
+    public static let borderOpacity = 0.08
+    public static let cornerRadius: CGFloat = 16
+    public static let textPrimaryHex = "#1C1C1E"
+    public static let textSecondaryHex = "#6E6E73"
+    public static let accentHex = "#3B76F6"
+    public static let maxWidth: CGFloat = 520
+    public static let minWidth: CGFloat = 280
+    public static let paddingVertical: CGFloat = 14
+    public static let paddingLeading: CGFloat = 16
+    public static let paddingTrailing: CGFloat = 20
+    public static let iconSize: CGFloat = 28
+    public static let iconCornerRadius: CGFloat = 7
+    public static let iconOverlap: CGFloat = 8
+    public static let maxIcons = 4
+    public static let fallbackIconSize: CGFloat = 24
+    public static let fallbackSymbol = "exclamationmark.circle.fill"
+    public static let iconToText: CGFloat = 12
+    public static let messageFontSize: CGFloat = 15
+    public static let captionFontSize: CGFloat = 12
+    public static let caption = "Rooms"
+    public static let topInset: CGFloat = 12
+    public static let duration: TimeInterval = 4
+    public static let fadeInDuration: TimeInterval = 0.15
+    public static let fadeOutDuration: TimeInterval = 0.2
+}
+
 /// Checkable values of the layout preview design (resources/layout-preview-design.md).
 public enum LayoutPreviewDesign {
     public static let cardFillHex = "#F2F2F4"

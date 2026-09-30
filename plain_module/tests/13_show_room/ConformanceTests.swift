@@ -107,22 +107,22 @@ final class ShowRoomTests: XCTestCase {
         XCTAssertEqual(h.fake.frame(of: a.identity), LayoutEngine.frames(for: .stack, count: 2, in: h.area)[0])
     }
 
-    private func seedDesign(_ h: Harness) -> (UUID, [AppWindow]) {
-        let figma = h.app("com.figma.Desktop", pid: 1, name: "Figma")
-        let linear = h.app("com.linear", pid: 2, name: "Linear")
-        let dia = h.app("company.thebrowser.dia", pid: 3, name: "Dia")
-        let windows = [h.window(figma, id: 1, title: "File"), h.window(linear, id: 2, title: "Issues"), h.window(dia, id: 3, title: "Docs")]
-        h.seed([Room(name: "Design", windows: windows, layout: .columns)])
+    private func seedRoomR(_ h: Harness) -> (UUID, [AppWindow]) {
+        let appA = h.app("com.example.a", pid: 1, name: "A")
+        let appB = h.app("com.example.b", pid: 2, name: "B")
+        let appC = h.app("com.example.c", pid: 3, name: "C")
+        let windows = [h.window(appA, id: 1, title: "File"), h.window(appB, id: 2, title: "Issues"), h.window(appC, id: 3, title: "Docs")]
+        h.seed([Room(name: "R", windows: windows, layout: .columns)])
         return (h.controller.rooms[0].id, windows)
     }
 
     func testAcceptanceQuitApplicationAsksToOpenIt() {
         let h = Harness()
-        let (id, windows) = seedDesign(h)
+        let (id, windows) = seedRoomR(h)
         h.fake.quitApplication(processIdentifier: 1)
         h.fake.clearOperations()
         h.controller.showRoom(id: id)
-        XCTAssertEqual(h.controller.notificationMessage, "Open Figma, then open “Design” again")
+        XCTAssertEqual(h.controller.notificationMessage, "Open A, then open “R” again")
         XCTAssertTrue(h.fake.operations.isEmpty, "nothing moved, hidden, or raised")
         XCTAssertEqual(h.fake.frame(of: windows[1].identity), CGRect(x: 100, y: 100, width: 800, height: 600))
         XCTAssertNil(h.controller.currentRoomID)
@@ -130,35 +130,95 @@ final class ShowRoomTests: XCTestCase {
 
     func testAcceptanceTwoQuitApplicationsAreJoined() {
         let h = Harness()
-        let (id, _) = seedDesign(h)
+        let (id, _) = seedRoomR(h)
         h.fake.quitApplication(processIdentifier: 1)
         h.fake.quitApplication(processIdentifier: 2)
         h.controller.showRoom(id: id)
-        XCTAssertEqual(h.controller.notificationMessage, "Open Figma and Linear, then open “Design” again")
+        XCTAssertEqual(h.controller.notificationMessage, "Open A and B, then open “R” again")
     }
 
     func testDirectKeyUsesTheSameCheck() {
         let h = Harness()
-        let (id, _) = seedDesign(h)
+        let (id, _) = seedRoomR(h)
         h.controller.assignDirectKey(4, toRoom: id)
         h.fake.quitApplication(processIdentifier: 3)
         h.controller.directKeyPressed(4)
-        XCTAssertEqual(h.controller.notificationMessage, "Open Dia, then open “Design” again")
+        XCTAssertEqual(h.controller.notificationMessage, "Open C, then open “R” again")
     }
 
     func testAcceptanceClosedWindowWhileAppRunsAsksToOpenIt() {
         let h = Harness()
-        let figma = h.app("com.figma.Desktop", pid: 1, name: "Figma")
-        let linear = h.app("com.linear", pid: 2, name: "Linear")
-        let dia = h.app("company.thebrowser.dia", pid: 3, name: "Dia")
-        // The Figma window was closed; Figma keeps running with no window.
-        let closed = AppWindow(identity: WindowIdentity(bundleIdentifier: figma.bundleIdentifier, processIdentifier: 1, windowID: 1), applicationName: "Figma", title: "File", frame: .zero)
-        let windows = [closed, h.window(linear, id: 2, title: "Issues"), h.window(dia, id: 3, title: "Docs")]
-        h.seed([Room(name: "Design", windows: windows, layout: .columns)])
-        XCTAssertTrue(h.fake.runningApplications().contains { $0.name == "Figma" })
+        let appA = h.app("com.example.a", pid: 1, name: "A")
+        let appB = h.app("com.example.b", pid: 2, name: "B")
+        let appC = h.app("com.example.c", pid: 3, name: "C")
+        // The window of A was closed; A keeps running with no window.
+        let closed = AppWindow(identity: WindowIdentity(bundleIdentifier: appA.bundleIdentifier, processIdentifier: 1, windowID: 1), applicationName: "A", title: "File", frame: .zero)
+        let windows = [closed, h.window(appB, id: 2, title: "Issues"), h.window(appC, id: 3, title: "Docs")]
+        h.seed([Room(name: "R", windows: windows, layout: .columns)])
+        XCTAssertTrue(h.fake.runningApplications().contains { $0.name == "A" })
         h.fake.clearOperations()
         h.controller.showRoom(id: h.controller.rooms[0].id)
-        XCTAssertEqual(h.controller.notificationMessage, "Open Figma, then open “Design” again")
+        XCTAssertEqual(h.controller.notificationMessage, "Open A, then open “R” again")
         XCTAssertTrue(h.fake.operations.isEmpty, "nothing moved or hidden")
+    }
+
+    func testAcceptanceFullScreenWindowLeavesFullScreenAndIsLaidOut() {
+        let h = Harness()
+        let appA = h.app("com.example.a", pid: 1, name: "A")
+        let appB = h.app("com.example.b", pid: 2, name: "B")
+        let appC = h.app("com.example.c", pid: 3, name: "C")
+        let windows = [h.window(appA, id: 1, title: "File"), h.window(appB, id: 2, title: "Issues"), h.window(appC, id: 3, title: "Docs")]
+        h.seed([Room(name: "R", windows: windows, layout: .columns)])
+        h.fake.setFullScreen(true, of: windows[0].identity)
+        XCTAssertFalse(h.fake.listWindows().contains { $0.identity == windows[0].identity }, "not listed while in full screen")
+        h.controller.showRoom(id: h.controller.rooms[0].id)
+        XCTAssertTrue(h.fake.operations.contains(.exitFullScreen(1)))
+        XCTAssertFalse(h.fake.operations.contains(.exitFullScreen(2)), "only apps with a missing window leave full screen")
+        XCTAssertEqual(h.fake.frame(of: windows[0].identity), LayoutEngine.frames(for: .columns, count: 3, in: h.area)[0])
+        XCTAssertNil(h.controller.notificationMessage)
+        XCTAssertEqual(h.controller.currentRoom?.name, "R")
+    }
+
+    func testFullScreenWindowThatNeverReturnsShowsTheNotification() {
+        let h = Harness()
+        let appA = h.app("com.example.a", pid: 1, name: "A")
+        let closed = AppWindow(identity: WindowIdentity(bundleIdentifier: "com.example.a", processIdentifier: 1, windowID: 1), applicationName: "A", title: "File", frame: .zero)
+        let other = h.window(appA, id: 2, title: "Other")
+        h.fake.setFullScreen(true, of: other.identity)
+        // The saved window is gone; leaving full screen brings back a window that another saved window already claims.
+        h.seed([Room(name: "R", windows: [closed, other], layout: .columns)])
+        h.controller.showRoom(id: h.controller.rooms[0].id)
+        XCTAssertLessThanOrEqual(h.fake.waitedMilliseconds, 2000 + 500, "waits at most 2 seconds")
+        XCTAssertEqual(h.controller.notificationMessage, "Open A, then open “R” again")
+    }
+
+    func testAcceptanceWindowOnAnotherDesktopShowsWhereItIs() {
+        let h = Harness()
+        let (id, windows) = seedRoomR(h)
+        h.fake.setOnOtherDesktop(true, of: windows[2].identity) // C
+        h.fake.clearOperations()
+        h.controller.showRoom(id: id)
+        XCTAssertEqual(h.controller.notificationMessage, "C is on another desktop. Move it to this one, then open “R” again")
+        XCTAssertEqual(h.controller.notification?.applications.map { $0.name }, ["C"])
+        XCTAssertTrue(h.fake.operations.isEmpty, "nothing moves")
+        XCTAssertNil(h.controller.currentRoomID)
+    }
+
+    func testAcceptanceTwoApplicationsOnAnotherDesktop() {
+        let h = Harness()
+        let (id, windows) = seedRoomR(h)
+        h.fake.setOnOtherDesktop(true, of: windows[1].identity) // B
+        h.fake.setOnOtherDesktop(true, of: windows[2].identity) // C
+        h.controller.showRoom(id: id)
+        XCTAssertEqual(h.controller.notificationMessage, "B and C are on another desktop. Move them to this one, then open “R” again")
+    }
+
+    func testQuitAndOtherDesktopTogetherAsksToOpen() {
+        let h = Harness()
+        let (id, windows) = seedRoomR(h)
+        h.fake.setOnOtherDesktop(true, of: windows[2].identity) // C elsewhere
+        h.fake.quitApplication(processIdentifier: 1)           // A quit
+        h.controller.showRoom(id: id)
+        XCTAssertEqual(h.controller.notificationMessage, "Open A and C, then open “R” again")
     }
 }

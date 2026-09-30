@@ -40,6 +40,15 @@ public protocol WindowSystem: AnyObject {
     /// Activates the application, raises the window, and gives it keyboard focus.
     func focus(_ window: WindowIdentity)
 
+    /// Process identifiers of applications with a window in full screen. The Accessibility API lists only the
+    /// windows of the current Space, so such a window is not in `listWindows()` while it is in full screen elsewhere.
+    func applicationsWithFullScreenWindows() -> Set<Int32>
+    /// Process identifiers of applications with a window on another desktop (Space), not in full screen; the
+    /// Accessibility API does not list such a window.
+    func applicationsWithWindowsOnOtherDesktops() -> Set<Int32>
+    /// Activates the application and takes its full-screen windows out of full screen.
+    func exitFullScreen(application processIdentifier: Int32)
+
     func isHidden(application processIdentifier: Int32) -> Bool
     func setHidden(_ hidden: Bool, application processIdentifier: Int32)
 
