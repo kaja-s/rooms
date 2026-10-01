@@ -1,19 +1,27 @@
-# Rooms
+# Rooms, Regenerated
 
-A macOS menu bar app that saves a project's windows as a named **room** and brings them back, laid out, from a ⌥Space palette.
+A macOS menu bar app that saves a project's windows as a named **room** and restores them in a layout from a ⌥Space palette. It reimplements [Rooms by Sara Gordić](https://github.com/saragordic/rooms). The Swift code is generated from [`rooms.plain`](rooms.plain), a [***plain](https://plainlang.org/) specification that was written and edited only by working with a coding agent.
 
 Open the windows a project needs, press ⌥Space, give them a name, and from then on one keystroke hides everything else and lays that project's windows out on your screen.
+
+<video src="docs/demo.mp4" controls muted width="100%"></video>
+
+[Watch the demo](docs/demo.mp4) (44 s)
 
 ## The experiment
 
 This project started from [Rooms by Sara Gordić](https://github.com/saragordic/rooms), an open-source macOS app. I wanted to see whether I could use **regenerative software** to recreate it and then add my own twist, without writing any code myself.
 
-I don't know Swift. So instead of editing code, I described the app in a natural-language spec that I can read and review: [`rooms.plain`](rooms.plain), written in [***plain](https://codeplain.ai). I rendered that spec into a working Swift app with **\*codeplain**. Every change to the app, whether a bug fix, a design tweak, or a new feature, was made in the spec first and then rendered again. The generated code in `plain_module/` and `dist/` is never edited by hand.
+I don't know Swift. So instead of editing code, I described the app's behavior in [`rooms.plain`](rooms.plain), a specification written in [***plain](https://plainlang.org/) that I can read and review. I wrote and updated the specification with [plain-forge](https://github.com/plainlang/plain-forge) and generated the Swift code from it with [pyro](https://github.com/plainlang/pyro), both open-source tools. Every change, whether a bug fix, a design tweak, or a new feature, was made in `rooms.plain` and the code was then regenerated. Nothing in `plain_module/` or `dist/` is edited by hand.
 
 ### Key lessons
 
-- **Coding agents are amazing at writing specs.** I used Claude Code with Fable 5 as the model. It interviewed me, turned vague requests ("the rooms are cropped", "only Focus and Stack work") into precise, testable specs, and traced each bug in the running app back to the part of the spec that caused it.
-- **I understand everything the app does, even outside my comfort zone.** Despite Swift, AppKit, and the macOS Accessibility API being far outside what I know, I reviewed every spec. Because the specs are plain English, with exact messages, sizes, and acceptance tests, I can explain every behavior of the app without reading a line of Swift.
+- **The agent wrote the specification and I only reviewed it.** I used Claude Code with Opus 5.5 and the plain-forge skills. It turned vague bug reports like "the rooms are cropped" and "only Focus and Stack work" into precise, testable requirements, and traced each bug in the running app back to the requirement that caused it.
+- **I can explain every behavior without reading Swift.** I don't know Swift, AppKit, or the macOS Accessibility API. The specification states exact messages, sizes, and acceptance tests in plain English, so reviewing it was enough.
+- **Write the key requirements in detail before the interview.** I did that, then told the agent to take its recommended defaults instead of asking me questions. The plain-forge q&a took about 25 minutes until the first MVP.
+- **Hand over designs as Markdown.** I made a simple design in Figma, had the agent convert it into a `.md` file, and refined it with a few front-end design skills. The results are in [`resources/`](resources).
+- **About 20 regenerations and one afternoon got the app to its current state.** After the first full generation, regenerations were fast enough that I tested other parts of the app while the agent fixed a bug.
+- **It was fun :)**
 
 ## Features
 
@@ -73,7 +81,7 @@ A short guide opens on first launch, and any time from the menu bar. It walks th
 
 Requirements: macOS 14 or newer and the Swift toolchain (Xcode or the command-line tools).
 
-This repository holds the spec, not the generated code. Render [`rooms.plain`](rooms.plain) with \*codeplain first. The renderer writes the Swift package to `plain_module/code/` and copies it to `dist/`. Then run:
+This repository holds the specification, not the generated code. Regenerate the app from [`rooms.plain`](rooms.plain) with [pyro](https://github.com/plainlang/pyro) first. Pyro writes the Swift package to `plain_module/code/` and copies it to `dist/`. Then run:
 
 ```sh
 cd dist
@@ -90,13 +98,14 @@ On first use, macOS asks for two permissions:
 |---|---|
 | [`rooms.plain`](rooms.plain) | **The source of truth.** The whole app as a natural-language spec: concepts, implementation and test requirements, functional specs, and acceptance tests. |
 | [`resources/`](resources) | Design documents the spec links to (palette, layout preview, notification). |
-| `plain_module/code/` | Swift code rendered from the spec. Never edited by hand, and not committed. |
-| `plain_module/tests/` | Conformance tests rendered from the spec, one folder per functional spec. Not committed. |
-| `dist/` | Copy of the rendered code to build and run. Not committed. |
+| `plain_module/code/` | Swift code regenerated from `rooms.plain`. Never edited by hand, and not committed. |
+| `plain_module/tests/` | Conformance tests regenerated from `rooms.plain`, one folder per functional spec. Not committed. |
+| `dist/` | Copy of the regenerated code to build and run. Not committed. |
+| [`docs/`](docs) | The demo video. |
 | [`test_scripts/`](test_scripts) | Scripts that prepare the environment and run the unit and conformance tests. |
-| [`config.yaml`](config.yaml) | Renderer configuration. |
+| [`config.yaml`](config.yaml) | Pyro configuration. |
 
-To change the app, change `rooms.plain` and render it again. The tests run against the fake window system, so they never touch your real windows:
+To change the app, change `rooms.plain` and regenerate it. The tests run against the fake window system, so they never touch your real windows:
 
 ```sh
 ./test_scripts/run_unittests_swift.sh plain_module/code
@@ -107,8 +116,9 @@ To change the app, change `rooms.plain` and render it again. The tests run again
 ## Credits
 
 - Original idea and app: [Sara Gordić, saragordic/rooms](https://github.com/saragordic/rooms), MIT License.
-- Spec language and rendering: [***plain / *codeplain](https://codeplain.ai).
-- Specs written with Claude Code.
+- Specification language: [***plain](https://plainlang.org/).
+- Specification written with Claude Code and [plain-forge](https://github.com/plainlang/plain-forge) (open source).
+- Code generated with [pyro](https://github.com/plainlang/pyro) (open source).
 
 ## License
 
