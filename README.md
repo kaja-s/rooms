@@ -4,24 +4,13 @@ A macOS menu bar app that saves a project's windows as a named **room** and rest
 
 Open the windows a project needs, press ⌥Space, give them a name, and from then on one keystroke hides everything else and lays that project's windows out on your screen.
 
-<video src="docs/demo.mp4" controls muted width="100%"></video>
-
-[Watch the demo](docs/demo.mp4) (44 s)
+https://github.com/user-attachments/assets/ef5daf38-f604-4fb6-96a6-387d97723c1a
 
 ## The experiment
 
 This project started from [Rooms by Sara Gordić](https://github.com/saragordic/rooms), an open-source macOS app. I wanted to see whether I could use **regenerative software** to recreate it and then add my own twist, without writing any code myself.
 
-I don't know Swift. So instead of editing code, I described the app's behavior in [`rooms.plain`](rooms.plain), a specification written in [***plain](https://plainlang.org/) that I can read and review. I wrote and updated the specification with [plain-forge](https://github.com/plainlang/plain-forge) and generated the Swift code from it with [pyro](https://github.com/plainlang/pyro), both open-source tools. Every change, whether a bug fix, a design tweak, or a new feature, was made in `rooms.plain` and the code was then regenerated. Nothing in `plain_module/` or `dist/` is edited by hand.
-
-### Key lessons
-
-- **The agent wrote the specification and I only reviewed it.** I used Claude Code with Opus 5.5 and the plain-forge skills. It turned vague bug reports like "the rooms are cropped" and "only Focus and Stack work" into precise, testable requirements, and traced each bug in the running app back to the requirement that caused it.
-- **I can explain every behavior without reading Swift.** I don't know Swift, AppKit, or the macOS Accessibility API. The specification states exact messages, sizes, and acceptance tests in plain English, so reviewing it was enough.
-- **Write the key requirements in detail before the interview.** I did that, then told the agent to take its recommended defaults instead of asking me questions. The plain-forge q&a took about 25 minutes until the first MVP.
-- **Hand over designs as Markdown.** I made a simple design in Figma, had the agent convert it into a `.md` file, and refined it with a few front-end design skills. The results are in [`resources/`](resources).
-- **About 20 regenerations and one afternoon got the app to its current state.** After the first full generation, regenerations were fast enough that I tested other parts of the app while the agent fixed a bug.
-- **It was fun :)**
+I wrote and updated the specification with [plain-forge](https://github.com/plainlang/plain-forge) and generated the Swift code from it with [pyro](https://github.com/plainlang/pyro), both open-source tools. Every change, whether a bug fix, a design tweak, or a new feature, was made in `rooms.plain` and the code was then regenerated. Nothing in `plain_module/` or `dist/` is edited by hand.
 
 ## Features
 
